@@ -9,16 +9,17 @@
  import {mapGetters} from 'vuex'
  import * as types from './store/mutation-types'
  import vLoading  from './components/loading/loading.vue'
+ 
  export default {
   name: 'App',
   components: {
     vLoading
   },
-    computed: {
-      ...mapGetters({
-        isLoading: [types.LOADING.IS_LOADING],
-      })
-    }
+  computed: {
+    ...mapGetters({
+      isLoading: [types.LOADING.IS_LOADING],
+    })
+  }
 }
 </script>
 
