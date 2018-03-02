@@ -1,12 +1,17 @@
 <template>
   <div id="app">
+    <rotate-square5></rotate-square5>
     <router-view/>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'App'
+ import {RotateSquare5} from 'vue-loading-spinner'
+ export default {
+  name: 'App',
+  components: {
+    RotateSquare5
+  }
 }
 </script>
 
