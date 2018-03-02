@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 import AxiosPlugin from './axios.js';
 Vue.use(AxiosPlugin);
 

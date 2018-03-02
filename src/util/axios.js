@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Vue from 'vue'
 export default {
     install: function(Vue) {
         axios.defaults.timeout = 5000; //响应时间
