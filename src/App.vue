@@ -1,17 +1,24 @@
 <template>
   <div id="app">
-    <rotate-square5></rotate-square5>
+    <v-loading :isLoading="isLoading"></v-loading>
     <router-view/>
   </div>
 </template>
 
 <script>
- import {RotateSquare5} from 'vue-loading-spinner'
+ import {mapGetters} from 'vuex'
+ import * as types from './store/mutation-types'
+ import vLoading  from './components/loading/loading.vue'
  export default {
   name: 'App',
   components: {
-    RotateSquare5
-  }
+    vLoading
+  },
+    computed: {
+      ...mapGetters({
+        isLoading: [types.LOADING.IS_LOADING],
+      })
+    }
 }
 </script>
 
