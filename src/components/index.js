@@ -1,4 +1,4 @@
 import Vue from 'vue'
+import Toast from './toast/toast.js'
 
-import ToastPlugin from './toast/toast.js';
-Vue.use(ToastPlugin);
+Vue.use(Toast, '$toast')

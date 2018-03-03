@@ -6,15 +6,18 @@
 </template>
 
 <script>
- import * as components from './components'
+ 
  import {mapGetters} from 'vuex'
  import * as types from './store/mutation-types'
  import vLoading  from './components/loading/loading.vue'
+  import vMenus  from './components/menus/menus.vue'
+ import * as components from './components'
  
  export default {
   name: 'App',
   components: {
-    vLoading
+    vLoading,
+    vMenus
   },
   computed: {
     ...mapGetters({

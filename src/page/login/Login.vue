@@ -36,24 +36,21 @@
           password:''
        } 
       },
-      mounted() {
-        
-      },
       methods: {
          ...mapActions([types.LOADING.PUSH_LOADING,types.LOADING.SHIFT_LOADING]),
-        signin : function (){ // 登录授权
+        signin : function (){ 
             var _this = this;
             var userName = _this.userName.trim();
             var password = _this.password.trim();
             if(_this.$lodash.isEmpty(userName)){
-                _this.$toast.error('登陆名称不可为空.');
+                _this.$toast.warning('登陆名称不可为空.');
                 return false;
             }
             if(_this.$lodash.isEmpty(password)){
-                _this.$toast.error('密码不可为空.');
+                _this.$toast.warning('密码不可为空.');
                 return false;
             }
-
+            _this.PUSH_LOADING();
             _this.$axios.post('login',{
                 username:userName,
                 password:password
@@ -61,17 +58,17 @@
                 var res = result.data;
                 switch (res.code) {
                     case 1000200: {
+                         _this.SHIFT_LOADING();
                         localStorage.setItem('ksx-token-c', res.token);
                         window.location.href = '/supplier/v_order';
                     } break;
                     default: {
-                        _this.$toast.error(res.msg, '提示');
+                        _this.$toast.error(res.msg);
                     }
                 }
             }).catch((err) => {
                 _this.SHIFT_LOADING();
             });
-
         },
       }
    }

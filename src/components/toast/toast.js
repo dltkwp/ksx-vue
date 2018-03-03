@@ -1,6 +1,6 @@
 import Vue from 'vue'
-
-const ToastConstructor = Vue.extend(require('./toast.vue'))
+import CToast from '@/components/toast/toast.vue';
+const ToastConstructor = Vue.extend(CToast)
 
 let removeDom = event => {
     event.target.parentNode.removeChild(event.target)
