@@ -69,7 +69,7 @@
         top:50%;
     }
     .toast.top{
-        top:80%;
+        top:5%;
     }
     .toast.bottom{
         top:90%;

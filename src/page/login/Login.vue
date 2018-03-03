@@ -17,7 +17,7 @@
                 <a href="javascript:;;"><small>忘记密码？</small></a>
                 <p class="text-muted text-center"><small>还没有账号？</small></p>
                 <a class="btn btn-sm btn-white btn-block" href="register.html">注册账号</a>
-
+                
             </form>
             <p class="m-t"> <small>注册成为分销商，月入过万</small> </p>
         </div>
@@ -58,7 +58,8 @@
                 var res = result.data;
                 switch (res.code) {
                     case 1000200: {
-                         _this.SHIFT_LOADING();
+                        _this.SHIFT_LOADING();
+                        localStorage.setItem('ksx-user-c', ''); //清理user信息,登陆后如果为空则再次查询
                         localStorage.setItem('ksx-token-c', res.token);
                         window.location.href = '/supplier/v_order';
                     } break;

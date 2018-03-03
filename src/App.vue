@@ -6,18 +6,28 @@
 </template>
 
 <script>
+
+/**
+ * 引入第三方JS类库
+ */
  
+ import "./lib/jquery-3.1.1.min.js"
+ import "./lib/bootstrap.min.js"
+ import "./lib/plugins/metisMenu/jquery.metisMenu.js"
+ import "./lib/plugins/slimscroll/jquery.slimscroll.min.js"
+ import "./lib/inspinia.js"
+ import "./lib/plugins/pace/pace.min.js"
+
  import {mapGetters} from 'vuex'
  import * as types from './store/mutation-types'
- import vLoading  from './components/loading/loading.vue'
-  import vMenus  from './components/menus/menus.vue'
  import * as components from './components'
+
+ import vLoading  from './components/loading/loading.vue'
  
  export default {
   name: 'App',
   components: {
-    vLoading,
-    vMenus
+    vLoading
   },
   computed: {
     ...mapGetters({
