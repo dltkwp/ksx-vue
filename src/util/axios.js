@@ -5,27 +5,38 @@ export default {
         axios.defaults.timeout = 5000; //响应时间
         axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'; //配置请求头
         axios.defaults.baseURL = 'http://39.106.65.215:8081/EasyTime/'; //配置接口地址
-        //POST传参序列化(添加请求拦截器)
-        // axios.interceptors.request.use((config) => {
-        //     console.log(config);
-        //     //在发送请求之前做某件事
-        //     if (config.method === 'post') {
-        //         config.data = qs.stringify(config.data);
-        //     }
-        //     return config;
-        // }, (error) => {
-        //     return Promise.reject(error);
-        // });
-        // //返回状态判断(添加响应拦截器)
-        // axios.interceptors.response.use((res) => {
-        //     //对响应数据做些事
-        //     if (!res.data.success) {
-        //         return Promise.reject(res);
-        //     }
-        //     return res;
-        // }, (error) => {
-        //     return Promise.reject(error);
-        // });
+
+        axios.interceptors.request.use(
+            config => {
+                let token = localStorage.getItem('ksx-token-c');
+                if (token) {
+                    config.headers.Authorization = token;
+                }
+                return config;
+            },
+            err => {
+                return Promise.reject(err);
+            });
+
+        axios.interceptors.response.use(
+            response => {
+                return response;
+            },
+            error => {
+                if (error.response) {
+                    switch (error.response.status) {
+                        case 401:
+                            // 返回 401 清除token信息并跳转到登录页面
+                            localStorage.setItem('ksx-token-c', '');
+                            router.replace({
+                                path: 'login',
+                                query: { redirect: router.currentRoute.fullPath }
+                            })
+                    }
+                }
+                return Promise.reject(error.response.data)
+            });
+
         Object.defineProperty(Vue.prototype, '$axios', { value: axios });
     }
 }

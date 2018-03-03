@@ -58,15 +58,15 @@
                 var res = result.data;
                 switch (res.code) {
                     case 1000200: {
-                        _this.SHIFT_LOADING();
                         localStorage.setItem('ksx-user-c', ''); //清理user信息,登陆后如果为空则再次查询
                         localStorage.setItem('ksx-token-c', res.token);
-                        window.location.href = '/supplier/v_order';
+                        window.location.href = '/v_index';
                     } break;
                     default: {
                         _this.$toast.error(res.msg);
                     }
                 }
+                _this.SHIFT_LOADING();
             }).catch((err) => {
                 _this.SHIFT_LOADING();
             });

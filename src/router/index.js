@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '@/page/login/Login'
+import Login from '@/page/login/login'
 import Index from '@/page/index/index'
+
+
+import User from './user'
 
 Vue.use(Router)
 
@@ -21,5 +24,5 @@ export default new Router({
             name: 'Index',
             component: Index
         },
-    ]
+    ].concat(User)
 })
