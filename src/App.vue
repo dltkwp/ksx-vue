@@ -6,6 +6,7 @@
 </template>
 
 <script>
+ import * as components from './components'
  import {mapGetters} from 'vuex'
  import * as types from './store/mutation-types'
  import vLoading  from './components/loading/loading.vue'

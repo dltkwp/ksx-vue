@@ -7,16 +7,17 @@
             <h3>欢迎使用速销平台</h3>
             <form class="m-t" role="form">
                 <div class="form-group">
-                    <input type="email" class="form-control" placeholder="账号" required="">
+                    <input v-model="userName" type="text" class="form-control" placeholder="账号">
                 </div>
                 <div class="form-group">
-                    <input type="password" class="form-control" placeholder="密码" required="">
+                    <input v-model="password" type="password" class="form-control" placeholder="密码">
                 </div>
-                <button type="submit" class="btn btn-primary block full-width m-b">登录</button>
+                <button @click="signin" type="button" class="btn btn-primary block full-width m-b">登录</button>
 
                 <a href="javascript:;;"><small>忘记密码？</small></a>
                 <p class="text-muted text-center"><small>还没有账号？</small></p>
                 <a class="btn btn-sm btn-white btn-block" href="register.html">注册账号</a>
+
             </form>
             <p class="m-t"> <small>注册成为分销商，月入过万</small> </p>
         </div>
@@ -31,37 +32,47 @@
    export default {
       data() {
        return {
-          
+          userName:'',
+          password:''
        } 
+      },
+      mounted() {
+        
       },
       methods: {
          ...mapActions([types.LOADING.PUSH_LOADING,types.LOADING.SHIFT_LOADING]),
-        signin() { // 登录授权
-         
+        signin : function (){ // 登录授权
+            var _this = this;
+            var userName = _this.userName.trim();
+            var password = _this.password.trim();
+            if(_this.$lodash.isEmpty(userName)){
+                _this.$toast.error('登陆名称不可为空.');
+                return false;
+            }
+            if(_this.$lodash.isEmpty(password)){
+                _this.$toast.error('密码不可为空.');
+                return false;
+            }
+
+            _this.$axios.post('login',{
+                username:userName,
+                password:password
+            }).then((result)=> {
+                var res = result.data;
+                switch (res.code) {
+                    case 1000200: {
+                        localStorage.setItem('ksx-token-c', res.token);
+                        window.location.href = '/supplier/v_order';
+                    } break;
+                    default: {
+                        _this.$toast.error(res.msg, '提示');
+                    }
+                }
+            }).catch((err) => {
+                _this.SHIFT_LOADING();
+            });
+
         },
-        sms_code() { // 获取短信验证码 
-         
-        },
-        clearTimer() {
-          this.smsTxt = "获取验证码"
-          this.interval.totalCnt= 60
-          this.interval.isActive = false
-          this.interval.instance && clearInterval(this.interval.instance)
-        },
-        startTimer() { // 开启计时器
-          this.interval.instance = setInterval(this.updateTimer,1000)
-        },
-        updateTimer() { // 计时器更新
-          this.interval.totalCnt--
-          if(this.interval.totalCnt!=0){
-              this.smsTxt = this.interval.totalCnt + "s后获取"
-          }else{
-              this.smsTxt = "重新获取"
-              this.interval.totalCnt= 60
-              this.interval.isActive = false
-              this.interval.instance && clearInterval(this.interval.instance)
-          }
-        } 
       }
    }
 </script>

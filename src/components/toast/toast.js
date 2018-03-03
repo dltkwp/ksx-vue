@@ -3,50 +3,50 @@ import Vue from 'vue'
 const ToastConstructor = Vue.extend(require('./toast.vue'))
 
 let removeDom = event => {
-  event.target.parentNode.removeChild(event.target)
+    event.target.parentNode.removeChild(event.target)
 }
 
-ToastConstructor.prototype.close = function () {
-  this.visible = false
-  this.$el.addEventListener('transitionend', removeDom)
+ToastConstructor.prototype.close = function() {
+    this.visible = false
+    this.$el.addEventListener('transitionend', removeDom)
 }
 const Toast = (options = {}) => {
-  var instance = new ToastConstructor().$mount(document.createElement('div'))
+    var instance = new ToastConstructor().$mount(document.createElement('div'))
 
-  let duration = options.duration || 2500
+    let duration = options.duration || 2500
 
-  instance.message = typeof options === 'string' ? options : options.message
+    instance.message = typeof options === 'string' ? options : options.message
 
-  instance.position = options.position || 'top'
+    instance.position = options.position || 'top'
 
-  instance.type = options.type || 'success'
+    instance.type = options.type || 'success'
 
-  document.body.appendChild(instance.$el)
+    document.body.appendChild(instance.$el)
 
-  instance.visible = true
+    instance.visible = true
 
-  Vue.nextTick(() => {
-    instance.timer = setTimeout(function () {
-      instance.close()
-    }, duration)
-  })
-  return instance
+    Vue.nextTick(() => {
+        instance.timer = setTimeout(function() {
+            instance.close()
+        }, duration)
+    })
+    return instance
 }
 
 export default {
-  install: function (Vue, name = 'Toast') {
-    Toast.info = (message, position) => {
-      Toast({message: message, position: (position || 'top'), type: 'info'})
+    install: function(Vue, name = 'Toast') {
+        Toast.info = (message, position) => {
+            Toast({ message: message, position: (position || 'top'), type: 'info' })
+        }
+        Toast.success = (message, position) => {
+            Toast({ message: message, position: (position || 'top'), type: 'success' })
+        }
+        Toast.warning = (message, position) => {
+            Toast({ message: message, position: (position || 'top'), type: 'warning' })
+        }
+        Toast.error = (message, position) => {
+            Toast({ message: message, position: (position || 'top'), type: 'error' })
+        }
+        Object.defineProperty(Vue.prototype, '$toast', { value: Toast })
     }
-    Toast.success = (message, position) => {
-      Toast({message: message, position: (position || 'top'), type: 'success'})
-    }
-    Toast.warning = (message, position) => {
-      Toast({message: message, position: (position || 'top'), type: 'warning'})
-    }
-    Toast.error = (message, position) => {
-      Toast({message: message, position: (position || 'top'), type: 'error'})
-    }
-    Object.defineProperty(Vue.prototype, '$Toast', { value: Toast })
-  }
 }
