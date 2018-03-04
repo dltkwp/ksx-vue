@@ -26,7 +26,7 @@
             <li><a href="order.html">订单管理</a></li>
             <li><a href="distributor.html">分销商管理</a></li>
             <li><a href="product.html">商品管理</a></li>
-            <li><router-link to="/v_category">分销等级设置</router-link></li>
+            <li v-bind:class="{active:childrenKey==='DistributorLevel'}"><router-link to="/v_level">分销等级设置</router-link></li>
             <li v-bind:class="{active:childrenKey==='GoodsCategory'}"><router-link to="/v_category">商品分类设置</router-link></li>
           </ul>
         </li>

@@ -6,6 +6,7 @@ import Index from '@/page/index/index'
 
 import User from './user'
 import GoodsCategory from './goodsCategory'
+import DistributorLevel from './distributor-level'
 
 Vue.use(Router)
 
@@ -29,5 +30,5 @@ export default new Router({
                 childrenKey: 'Index'
             }
         },
-    ].concat(User).concat(GoodsCategory)
+    ].concat(User).concat(GoodsCategory).concat(DistributorLevel)
 })

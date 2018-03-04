@@ -42,7 +42,7 @@
             </div>
           </div>
         </div>
-        <div id="type-add" class="modal fade" aria-hidden="true" style="display: none;">
+        <div id="add" class="modal fade" aria-hidden="true" style="display: none;">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -68,7 +68,7 @@
             </div>
           </div>
         </div>
-        <div id="type-edit" class="modal fade" aria-hidden="true" style="display: none;">
+        <div id="edit" class="modal fade" aria-hidden="true" style="display: none;">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -95,30 +95,30 @@
           </div>
         </div>
         <div id="divConfirmModal" class="modal fade" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title">温馨提示</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-sm-12">
-                <form role="form">
-                  <div class="form-group">
-                      确定是否删除该分类?
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">温馨提示</h4>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <form role="form">
+                      <div class="form-group">
+                          确定是否删除该分类?
+                      </div>
+                    </form>
                   </div>
-                </form>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button v-bind:disabled="loading" v-bind:readonly="loading" @click="confirm()" type="button" class="btn btn-primary">确定</button>
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button v-bind:disabled="loading" v-bind:readonly="loading" @click="confirm()" type="button" class="btn btn-primary">确定</button>
-            <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-          </div>
         </div>
-      </div>
-    </div>
       </div>
       <v-foot></v-foot>
    </div>
@@ -162,13 +162,13 @@ export default {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
     showSaveModal() {
       this.save.categoriesName = "";
-      $("#type-add").modal("show");
+      $("#add").modal("show");
     },
     showEditModal(index) {
       let cur = this.list[index];
       this.edit.categoriesName = cur.categoriesName;
       this.edit.id = cur.id;
-      $("#type-edit").modal("show");
+      $("#edit").modal("show");
     },
     showConfirmModal(index){
       this.index = index;
@@ -222,7 +222,7 @@ export default {
               {
                 _this.$toast.success("操作成功");
                 _this.listData();
-                $("#type-add").modal("hide");
+                $("#add").modal("hide");
               }
               break;
             default: {
@@ -257,7 +257,7 @@ export default {
               {
                 _this.$toast.success("操作成功");
                 _this.listData();
-                $("#type-edit").modal("hide");
+                $("#edit").modal("hide");
               }
               break;
             default: {
