@@ -16,7 +16,7 @@
           </div>
           <div class="logo-element"> KSX </div>
         </li>
-        <li class="active"> 
+        <li  v-bind:class="{active:parentKey==='Supplier'}"> 
           <a href="javascript:;;">
             <i class="fa fa-sitemap"></i> 
             <span class="nav-label">我是供应商</span> 
@@ -26,11 +26,12 @@
             <li><a href="order.html">订单管理</a></li>
             <li><a href="distributor.html">分销商管理</a></li>
             <li><a href="product.html">商品管理</a></li>
-            <li><a href="setting-level.html">分销等级设置</a></li>
-            <li><a href="setting-type.html">商品分类设置</a></li>
+            <li><router-link to="/v_category">分销等级设置</router-link></li>
+            <li v-bind:class="{active:childrenKey==='GoodsCategory'}"><router-link to="/v_category">商品分类设置</router-link></li>
           </ul>
         </li>
-        <li> <a href="javascript:;;">
+        <li> 
+          <a href="javascript:;;">
           <i class="fa fa-sitemap"></i>
          <span class="nav-label">我是分销商</span> 
          <span class="fa arrow"></span></a>
@@ -70,12 +71,13 @@
       let _this = this;
       let userInfo = localStorage.getItem('ksx-user-c');
       if(!_this.$lodash.isEmpty(userInfo)){
-        _this.userInfo.userName = userInfo.realname;
-        _this.userInfo.userType = userInfo.userType;
+        let u =  JSON.parse(userInfo);
+        _this.userInfo.userName = u.realname;
+        _this.userInfo.userType = u.userType;
       } else {
         _this.$axios.get('user').then((result)=> {
             let res = result.data;
-            localStorage.setItem('ksx-user-c', JSON.stringify(result.data) );
+            localStorage.setItem('ksx-user-c', JSON.stringify(result.data));
             _this.userInfo.userName = res.realname;
             _this.userInfo.userType = res.userType;
         }).catch((err) => {});
@@ -83,7 +85,6 @@
       let meta = _this.$route.meta;
       _this.parentKey   = meta.parentKey;
       _this.childrenKey = meta.childrenKey; 
-      console.log(meta);
     }
   };
 </script>

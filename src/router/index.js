@@ -5,6 +5,7 @@ import Index from '@/page/index/index'
 
 
 import User from './user'
+import GoodsCategory from './goodsCategory'
 
 Vue.use(Router)
 
@@ -22,7 +23,11 @@ export default new Router({
         {
             path: '/v_index',
             name: 'Index',
-            component: Index
+            component: Index,
+            meta: {
+                parentKey: 'Index',
+                childrenKey: 'Index'
+            }
         },
-    ].concat(User)
+    ].concat(User).concat(GoodsCategory)
 })
