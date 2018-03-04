@@ -17,17 +17,17 @@
                   <div class="col-sm-4">
                     <div class="form-group">
                       <label class="control-label" for="price">分类</label>
-                      <select name="status" id="status" class="form-control">
-                        <option value="1" selected="">分类1</option>
-                        <option value="0">分类2</option>
+                      <select v-model="resarch.categorySelectedId" class="form-control">
+                         <option v-for="item in categoryList" v-bind:value="item.id">
+                            {{ item.categoriesName }}
+                          </option>
                       </select>
                     </div>
                   </div>
-                
                   <div class="col-sm-4">
                     <div class="form-group">
                       <label class="control-label" for="status">状态</label>
-                      <select name="status" id="status" class="form-control">
+                      <select v-model="resarch.status" class="form-control">
                         <option value="1" selected="">在售</option>
                         <option value="0">停售</option>
                       </select>
@@ -39,7 +39,9 @@
                 <div class="ibox-title"> 商品列表 </div>
                 <div class="ibox-content">
                   <div class="row">
-                    <div class="col-sm-9 m-b-xs"> <a class="btn btn-primary btn-sm" href="add-product.html">新增商品</a> </div>
+                    <div class="col-sm-9 m-b-xs"> 
+                      <a class="btn btn-primary btn-sm" href="add-product.html">新增商品</a> 
+                    </div>
                   </div>
                   <div class="table-responsive">
                     <table class="table table-striped">
@@ -118,11 +120,17 @@
         return {
           loading: false,
           index:-1,
-          list: []
+          list: [],
+          resarch:{
+            categorySelectedId:'',
+            status:1
+          },
+          categoryList:[]
         };
       },
       mounted() {
-        this.listData();
+        this.resarch.status = 1;
+        this.categoryListData();
       },
       methods: {
         ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
@@ -130,7 +138,7 @@
           let _this = this;
           _this.PUSH_LOADING();
           _this.$axios
-            .get("categories")
+            .get("products")
             .then(result => {
               let res = result.data;
               _this.list = res;
@@ -139,7 +147,16 @@
             .catch(err => {
               _this.SHIFT_LOADING();
             });
-        }
+        },
+        categoryListData(){
+          let _this = this;
+            _this.$axios.get('categories').then((result)=> {
+              _this.categoryList = result.data;
+              if(result.data.length > 0){
+                _this.resarch.categorySelectedId = result.data[0].id;
+              }
+            }).catch(err => {});
+        },
       }
     };
 </script>

@@ -11,7 +11,7 @@ import Goods from './distributor-goods'
 
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
     mode: 'history',
     routes: [{
             path: '/',
@@ -32,4 +32,18 @@ export default new Router({
             }
         },
     ].concat(User).concat(GoodsCategory).concat(DistributorLevel).concat(Goods)
+});
+
+
+router.beforeEach((to, from, next) => {
+    if (to.name !== 'Login') {
+        let token = localStorage.getItem('ksx-token-c');
+        if (!token) {
+            localStorage.setItem('ksx-user-c', '');
+            window.location.href = '/v_login';
+        }
+    }
+    next();
 })
+
+export default router
