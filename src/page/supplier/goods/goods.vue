@@ -17,8 +17,8 @@
                   <div class="col-sm-4">
                     <div class="form-group">
                       <label class="control-label" for="price">分类</label>
-                      <select v-model="resarch.categorySelectedId" class="form-control">
-                         <option v-for="item in categoryList" v-bind:value="item.id">
+                      <select v-model="resarch.categoriesId" class="form-control">
+                          <option v-for="item in categoryList" v-bind:value="item.id">
                             {{ item.categoriesName }}
                           </option>
                       </select>
@@ -28,6 +28,7 @@
                     <div class="form-group">
                       <label class="control-label" for="status">状态</label>
                       <select v-model="resarch.status" class="form-control">
+                        <option value="-1" selected="">全部</option>
                         <option value="1" selected="">在售</option>
                         <option value="0">停售</option>
                       </select>
@@ -40,7 +41,7 @@
                 <div class="ibox-content">
                   <div class="row">
                     <div class="col-sm-9 m-b-xs"> 
-                      <a class="btn btn-primary btn-sm" href="add-product.html">新增商品</a> 
+                      <router-link class="btn btn-primary btn-sm" to="/v_supplier_goods_save">新增商品</router-link>
                     </div>
                   </div>
                   <div class="table-responsive">
@@ -92,6 +93,7 @@
                         </tr>
                       </tbody>
                     </table>
+                    <pagination :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
                   </div>
                 </div>
               </div>
@@ -109,12 +111,14 @@
     import vMenus from "@/components/menus/menus.vue";
     import vTop from "@/components/top/top.vue";
     import vFoot from "@/components/foot/foot.vue";
+    import pagination from '@/components/pagination/pagination.vue';
 
     export default {
       components: {
         vMenus,
         vTop,
-        vFoot
+        vFoot,
+        pagination
       },
       data() {
         return {
@@ -122,26 +126,51 @@
           index:-1,
           list: [],
           resarch:{
-            categorySelectedId:'',
-            status:1
+            categoriesId:-1,
+            status:-1,
+            productName:''
           },
-          categoryList:[]
+          categoryList:[],
+          parentTotalPage: 0,
+          parentCurrentpage: 1
         };
       },
       mounted() {
-        this.resarch.status = 1;
+        this.resarch.status = -1;
         this.categoryListData();
+        this.listData();
       },
       methods: {
         ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+        //在这里传入pagination的跳转页码回调方法
+        //cPage参数是已跳转的当前页码
+        parentCallback(cPage)  {
+          //这里是页码变化后要做的事
+          console.log('Update your data here. Page: ' + cPage);
+        },
         listData() {
           let _this = this;
           _this.PUSH_LOADING();
+          let param = []
+          param.push('pageNum=' + _this.parentCurrentpage);
+          param.push('pageSize=' + 15);
+          if(!_this.$lodash.isEmpty(_this.resarch.productName)){
+            param.push('productName=' + _this.resarch.productName);
+          }
+          if(parseInt(_this.resarch.categoriesId) >-1){
+            param.push('categoriesId=' + _this.resarch.categoriesId);
+          }
+          if(parseInt(_this.resarch.status) >-1){
+            param.push('status=' + _this.resarch.status);
+          }
+          console.log(param);
+
           _this.$axios
-            .get("products")
+            .get("products?"+param.join('&'))
             .then(result => {
               let res = result.data;
-              _this.list = res;
+              _this.parentTotalPage = res.total;
+              _this.list = res.list;
               _this.SHIFT_LOADING();
             })
             .catch(err => {
@@ -151,10 +180,11 @@
         categoryListData(){
           let _this = this;
             _this.$axios.get('categories').then((result)=> {
-              _this.categoryList = result.data;
-              if(result.data.length > 0){
-                _this.resarch.categorySelectedId = result.data[0].id;
-              }
+              let tempArr = [];
+              tempArr.push({categoriesName:'全部',id:-1});
+              tempArr = tempArr.concat(result.data);
+              _this.categoryList = tempArr;
+              _this.resarch.categoriesId = -1;
             }).catch(err => {});
         },
       }

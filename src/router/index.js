@@ -5,7 +5,7 @@ import Index from '@/page/index/index'
 
 
 import User from './user'
-import GoodsCategory from './goodsCategory'
+import GoodsCategory from './goods-category'
 import DistributorLevel from './distributor-level'
 import Goods from './distributor-goods'
 
