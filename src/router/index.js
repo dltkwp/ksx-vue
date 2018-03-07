@@ -8,6 +8,7 @@ import User from './user'
 import GoodsCategory from './goods-category'
 import DistributorLevel from './distributor-level'
 import Goods from './distributor-goods'
+import Order from './order'
 
 Vue.use(Router)
 
@@ -31,7 +32,7 @@ let router = new Router({
                 childrenKey: 'Index'
             }
         },
-    ].concat(User).concat(GoodsCategory).concat(DistributorLevel).concat(Goods)
+    ].concat(User).concat(GoodsCategory).concat(DistributorLevel).concat(Goods).concat(Order)
 });
 
 

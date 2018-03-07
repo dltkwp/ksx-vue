@@ -23,7 +23,7 @@
             <span class="fa arrow"></span>
           </a>
           <ul class="nav nav-second-level collapse in" style="">
-            <li><a href="order.html">订单管理</a></li>
+            <li v-bind:class="{active:childrenKey==='SupplierOrder'}"><router-link to="/v_supplier_order">订单管理</router-link></li>
             <li><a href="distributor.html">分销商管理</a></li>
             <li><a href="v_supplier_goods">商品管理</a></li>
             <li v-bind:class="{active:childrenKey==='DistributorGoods'}"><router-link to="/v_supplier_goods">分销等级设置</router-link></li>
