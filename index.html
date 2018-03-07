@@ -5,6 +5,27 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>ksx</title>
+    <script>
+        function discountValidate(v) {
+            var res = /^\d+(.\d{1,1})?$/.test(v);
+            if (res) {
+                res = (parseFloat(v) < 1) ? false : true;
+                if (res && (parseFloat(v) > 10)) {
+                    res = false;
+                }
+            }
+            return res;
+        }
+        function priceValidate(v) {
+            return /^\d+(.\d{1,2})?$/.test(v);
+        }
+        function numberValidate(v) {
+            return /^[1-9]\d*?$/.test(v);
+        }
+        function numberExValidate(v) {
+            return /^[0-9]\d*?$/.test(v);
+        }
+    </script>
 </head>
 
 <body class="pace-done">
