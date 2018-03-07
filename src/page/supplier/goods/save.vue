@@ -17,10 +17,10 @@
                               <div class="panel-body">
                                   <fieldset class="form-horizontal">
                                       <div class="form-group"><label class="col-sm-2 control-label">ID:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="编号"></div>
+                                          <div class="col-sm-10"><input v-model="save.productNo" type="text" class="form-control" placeholder="编号" maxlenth="20"></div>
                                       </div>
                                       <div class="form-group"><label class="col-sm-2 control-label">名称:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="产品名称"></div>
+                                          <div class="col-sm-10"><input  v-model="save.productName"  type="text" class="form-control" placeholder="产品名称" maxlenth="20"></div>
                                       </div>
                                       <div class="form-group"><label class="col-sm-2 control-label">分类:</label>
                                           <div class="col-sm-10">
@@ -32,16 +32,16 @@
                                           </div>
                                       </div>
                                       <div class="form-group"><label class="col-sm-2 control-label">成本:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="成本"></div>
+                                          <div class="col-sm-10"><input v-model="save.cost" type="text" class="form-control" placeholder="成本"  maxlenth="8"></div>
                                       </div>
                                       <div class="form-group"><label class="col-sm-2 control-label">建议售价:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="建议售价"></div>
+                                          <div class="col-sm-10"><input  v-model="save.recommendedRetailPrice"  type="text" class="form-control" placeholder="建议售价"   maxlenth="8"></div>
                                       </div>
                                         <div class="form-group"><label class="col-sm-2 control-label">最低售价:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="最低售价"></div>
+                                          <div class="col-sm-10"><input  v-model="save.minRetailPrice"  type="text" class="form-control" placeholder="最低售价"  maxlenth="8"></div>
                                       </div>
                                         <div class="form-group"><label class="col-sm-2 control-label">库存:</label>
-                                          <div class="col-sm-10"><input type="text" class="form-control" placeholder="库存"></div>
+                                          <div class="col-sm-10"><input   v-model="save.stock" type="text" class="form-control" placeholder="库存" maxlenth="8"></div>
                                       </div>
                                       <div class="form-group"><label class="col-sm-2 control-label">状态:</label>
                                           <div class="col-sm-10">
@@ -54,14 +54,14 @@
                                       <div class="form-group"><label class="col-sm-2 control-label">产品介绍:</label>
                                           <div class="col-sm-10">
                                               <div class="summernote">
-                                                  <h3>请添加产品描述</h3>
+                                                <input v-model="save.description" type="text" class="form-control" placeholder="" maxlenth="8">
                                               </div>
                                           </div>
                                       </div>
                                       <div class="hr-line-dashed"></div>
                                       <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">
-                                          <button class="btn btn-primary" type="button">保存</button>
+                                          <button  v-bind:disabled="loading" v-bind:readonly="loading" @click="saveBase()"  class="btn btn-primary" type="button">保存</button>
                                         </div>
                                       </div>
                                   </fieldset>
@@ -236,11 +236,20 @@
       },
       data() {
         return {
+          loading:false,
           categoryList:[],
           tabType:'base', //base: 基本信息,price: 分销价格设置 , images: 图片
           save:{
               status:1,
-              categoriesId:''
+              categoriesId:'',
+              productNo:'',
+              productName:'',
+              cost:'',
+              recommendedRetailPrice:'',
+              minRetailPrice:'',
+              stock:'',
+              description:'',
+              id:''
           },
         };
       },
@@ -256,6 +265,84 @@
                 case "price":{}break;
                 case "images":{}break;
             }
+        },
+        saveBase(){
+            let _this = this;
+            let status = _this.save.status;
+            let categoriesId = _this.save.categoriesId;
+            let productNo = _this.save.productNo;
+            let productName = _this.save.productName;
+            let cost = _this.save.cost;
+            let recommendedRetailPrice = _this.save.recommendedRetailPrice;
+            let minRetailPrice = _this.save.minRetailPrice;
+            let stock = _this.save.stock;
+            let description = _this.save.description;
+            
+            if(!productNo){
+                _this.$toast.warning("编号不可为空");
+                return false;
+            }
+            if(!productName){
+                _this.$toast.warning("产品名称不可为空");
+                return false;
+            }
+            if(!priceValidate(cost)){
+                _this.$toast.warning("成本格式不正确");
+                return false;
+            }
+            if(!priceValidate(recommendedRetailPrice)){
+                _this.$toast.warning("建议售价格式不正确");
+                return false;
+            }  
+            if(!priceValidate(minRetailPrice)){
+                _this.$toast.warning("最低售价格式不正确");
+                return false;
+            }  
+            if(!numberExValidate(stock)){
+                _this.$toast.warning("库存格式不正确");
+                return false;
+            }  
+
+            _this.loading = true;
+            _this.$axios
+                .put("products", {
+                    status:status,
+                    categoriesId:categoriesId,
+                    productNo:productNo,
+                    productName:productName,
+                    cost:cost,
+                    recommendedRetailPrice:recommendedRetailPrice,
+                    minRetailPrice:minRetailPrice,
+                    stock:stock,
+                    description:description
+                })
+                .then(result => {
+                    let res = result.data;
+                    switch (res.code) {
+                        case 200:
+                        {
+                            _this.$toast.success("操作成功");
+                            _this.listData();
+                        }
+                        break;
+                        default: {
+                        _this.$toast.error(res.msg);
+                        }
+                    }
+                    _this.loading = false;
+                    _this.SHIFT_LOADING();
+                })
+                .catch(err => {
+                    _this.loading = false;
+                    _this.SHIFT_LOADING();
+                });
+        },
+        savePrice(){
+            let _this = this;
+        },
+        saveImages(){
+            let _this = this;
+
         },
         categoryListData(){
           let _this = this;
