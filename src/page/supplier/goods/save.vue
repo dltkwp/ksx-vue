@@ -25,7 +25,7 @@
                                       <div class="form-group"><label class="col-sm-2 control-label">分类:</label>
                                           <div class="col-sm-10">
                                               <select  v-model="save.categoriesId" class="form-control" >
-                                                   <option v-for="item in categoryList" v-bind:value="item.id">
+                                                   <option v-for="(item,index) in categoryList" :key="index" v-bind:value="item.id">
                                                     {{ item.categoriesName }}
                                                 </option>
                                               </select>

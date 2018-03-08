@@ -18,7 +18,7 @@
                     <div class="form-group">
                       <label class="control-label" for="price">分类</label>
                       <select v-model="resarch.categoriesId" class="form-control">
-                          <option v-for="item in categoryList" v-bind:value="item.id">
+                          <option v-for="(item,index) in categoryList" :key="index" v-bind:value="item.id">
                             {{ item.categoriesName }}
                           </option>
                       </select>
