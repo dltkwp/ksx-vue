@@ -147,12 +147,48 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button  v-bind:disabled="loading" v-bind:readonly="loading"  type="button" @click="sendSubmit()" class="btn btn-primary">保存</button>
+                  <button v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="sendSubmit()" class="btn btn-primary">保存</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
             </div>
           </div>
+
+          <div id="modal-send-view" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  <h4 class="modal-title">发货</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form role="form">
+                        <div class="form-group">
+                          <label>快递公司</label>
+                          <input v-model="view.company" type="text" placeholder="请输入快递公司" class="form-control" maxlength="50">
+                        </div>
+                        <div class="form-group">
+                          <label>快递单号</label>
+                          <input v-model="view.expressOrder" type="text" placeholder="请输入快递单号" class="form-control" maxlength="50">
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="sendSubmit()" class="btn btn-primary">保存</button>
+                  <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </div>
     </div>
@@ -212,14 +248,126 @@
       sendSubmit: function () {
         let _this = this;
         let company = _this.send.company.trim();
-        let  expressOrder = _this.send.expressOrder.trim();
-        
+        let expressOrder = _this.send.expressOrder.trim();
+        if (company.trim() === '') {
+          _this.$toast.warning("名称不可为空");
+          return false;
+        }
+        if (expressOrder.trim() === '') {
+          _this.$toast.warning("单号不可为空");
+          return false;
+        }
+        let orderId = 0;
+        let curOrder = _this.list[_this.curIndex];
+        if (curOrder) {
+          orderId = curOrder.orderId;
+        }
+
+        _this.loading = true;
+        _this.$axios
+          .post("delivery", {
+            company: company,
+            expressOrder: expressOrder,
+            orderId: orderId
+          })
+          .then(result => {
+            let res = result.data;
+            switch (res.code) {
+              case 200:
+                {
+                  _this.$toast.success("操作成功");
+                  _this.listData();
+                  $("#modal-send").modal("hide");
+                }
+                break;
+              default:
+                {
+                  _this.$toast.error(res.msg);
+                }
+            }
+            _this.loading = false;
+            _this.SHIFT_LOADING();
+          })
+          .catch(err => {
+            _this.loading = false;
+            _this.SHIFT_LOADING();
+          });
       },
       showViewModal: function (index) {
         this.curIndex = index;
         let cur = this.list[index];
-        this.view = cur;
-        $("#modal-send").modal("show");
+        this.getExpressOrder(cur.orderId,function(result){
+          this.view = result;
+          $("#modal-send-view").modal("show");
+        });
+      },
+      getExpressOrder:function(orderId,cb){
+          _this.$axios
+          .get("delivery", {
+            orderId: orderId
+          })
+          .then(result => {
+            let res = result.data;
+            switch (res.code) {
+              case 200:
+                {
+                   cb&&cb(res.data);
+                }
+                break;
+              default:
+                {
+                  _this.$toast.error(res.msg);
+                }
+            }
+          })
+          .catch(err => {});
+      },
+      updateSubmit:function(){
+        let _this = this;
+        let company = _this.view.company.trim();
+        let expressOrder = _this.view.expressOrder.trim();
+        if (company.trim() === '') {
+          _this.$toast.warning("名称不可为空");
+          return false;
+        }
+        if (expressOrder.trim() === '') {
+          _this.$toast.warning("单号不可为空");
+          return false;
+        }
+        let orderId = 0;
+        let curOrder = _this.list[_this.curIndex];
+        if (curOrder) {
+          orderId = curOrder.orderId;
+        }
+        _this.loading = true;
+        _this.$axios
+          .put("delivery", {
+            company: company,
+            expressOrder: expressOrder,
+            orderId: orderId
+          })
+          .then(result => {
+            let res = result.data;
+            switch (res.code) {
+              case 200:
+                {
+                  _this.$toast.success("操作成功");
+                  _this.listData();
+                  $("#modal-send-view").modal("hide");
+                }
+                break;
+              default:
+                {
+                  _this.$toast.error(res.msg);
+                }
+            }
+            _this.loading = false;
+            _this.SHIFT_LOADING();
+          })
+          .catch(err => {
+            _this.loading = false;
+            _this.SHIFT_LOADING();
+          });
       },
       parentCallback(cPage) {
         this.listData();
@@ -252,3 +400,4 @@
   };
 
 </script>
+
