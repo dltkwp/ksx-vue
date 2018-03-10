@@ -305,7 +305,7 @@
 
             _this.loading = true;
             _this.$axios
-                .put("products", {
+                .post("products", {
                     status:status,
                     categoriesId:categoriesId,
                     productNo:productNo,
@@ -322,7 +322,6 @@
                         case 200:
                         {
                             _this.$toast.success("操作成功");
-                            _this.listData();
                         }
                         break;
                         default: {
@@ -349,7 +348,7 @@
             _this.$axios.get('categories').then((result)=> {
               _this.categoryList = result.data;
               if(result.data.length>0){
-                _this.resarch.categoriesId = result.data[0].id;
+                _this.save.categoriesId = result.data[0].id;
               }
             }).catch(err => {});
         },

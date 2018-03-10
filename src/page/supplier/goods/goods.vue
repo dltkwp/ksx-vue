@@ -63,32 +63,18 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td> 1 </td>
-                          <td><img src="img/gallery/2s.jpg" class="img-lg"> 洗发水 </td>
-                          <td> 洗发类 </td>
-                          <td> ￥10.00 </td>
-                          <td> ￥50.00 </td>
-                          <td> ￥50.00 </td>
+                        <tr v-for="(item,index) in list" :key="index">
+                          <td> {{index + 1}}</td>
+                          <td><img src="img/gallery/2s.jpg" class="img-lg"> {{item.productName}} </td>
+                          <td> {{item.categoriesName}} </td>
+                          <td> ￥{{item.minRetailPrice}} </td>
+                          <td> ￥{{item.recommendedRetailPrice}} </td>
+                          <td> ￥{{item.minRetailPrice}} </td>
                           <td> ￥30.00 </td>
                           <td> ￥35.00 </td>
                           <td> ￥40.00 </td>
-                          <td>100 </td>
+                          <td> {{item.stock}} </td>
                           <td><span class="label label-primary">在售</span></td>
-                          <td><button class="btn-white btn btn-sm">查看</button></td>
-                        </tr>
-                        <tr>
-                          <td> 2 </td>
-                          <td><img src="img/gallery/2s.jpg" class="img-lg">  洗发水 </td>
-                          <td> 洗发类 </td>
-                          <td> ￥10.00 </td>
-                          <td> ￥50.00 </td>
-                          <td> ￥50.00 </td>
-                          <td> ￥30.00 </td>
-                          <td> ￥35.00 </td>
-                          <td> ￥40.00 </td>
-                          <td>100 </td>
-                          <td><span class="label label-danger">停售</span></td>
                           <td><button class="btn-white btn btn-sm">查看</button></td>
                         </tr>
                       </tbody>
@@ -130,6 +116,7 @@
             status:-1,
             productName:''
           },
+          categoriesIdMap:[],
           categoryList:[],
           parentTotalPage: 0,
           parentCurrentpage: 1
@@ -142,11 +129,9 @@
       },
       methods: {
         ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-        //在这里传入pagination的跳转页码回调方法
-        //cPage参数是已跳转的当前页码
         parentCallback(cPage)  {
-          //这里是页码变化后要做的事
-          console.log('Update your data here. Page: ' + cPage);
+          this.parentCurrentpage = cPage;
+          this.listData();
         },
         listData() {
           let _this = this;
@@ -163,13 +148,15 @@
           if(parseInt(_this.resarch.status) >-1){
             param.push('status=' + _this.resarch.status);
           }
-          console.log(param);
-
           _this.$axios
             .get("products?"+param.join('&'))
             .then(result => {
               let res = result.data;
-              _this.parentTotalPage = res.total;
+              _this.parentTotalPage = res.pages;
+              _this.$lodash.forEach(res.list,function(item){
+                  let _category = _this.categoriesIdMap[item.categoriesId];
+                  item.categoriesName = _category?_category.categoriesName:'';
+              });
               _this.list = res.list;
               _this.SHIFT_LOADING();
             })
@@ -183,6 +170,10 @@
               let tempArr = [];
               tempArr.push({categoriesName:'全部',id:-1});
               tempArr = tempArr.concat(result.data);
+              _this.$lodash.forEach(result.data,function(item){
+                 _this.categoriesIdMap[item.id] = item;
+              });
+
               _this.categoryList = tempArr;
               _this.resarch.categoriesId = -1;
             }).catch(err => {});
