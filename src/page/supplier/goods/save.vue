@@ -322,6 +322,7 @@
                         case 200:
                         {
                             _this.$toast.success("操作成功");
+                            _this.save.id = res.id;
                         }
                         break;
                         default: {

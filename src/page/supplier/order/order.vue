@@ -181,7 +181,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="sendSubmit()" class="btn btn-primary">保存</button>
+                  <button v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="updateSubmit()" class="btn btn-primary">保存</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
@@ -250,26 +250,26 @@
         let company = _this.send.company.trim();
         let expressOrder = _this.send.expressOrder.trim();
         if (company.trim() === '') {
-          _this.$toast.warning("名称不可为空");
+          _this.$toast.warning("快递公司不可为空");
           return false;
         }
         if (expressOrder.trim() === '') {
-          _this.$toast.warning("单号不可为空");
+          _this.$toast.warning("快递单号不可为空");
           return false;
         }
         let orderId = 0;
         let curOrder = _this.list[_this.curIndex];
         if (curOrder) {
-          orderId = curOrder.orderId;
+          orderId = curOrder.id;
         }
 
         _this.loading = true;
+        let params  = [];
+        params.push('company='+company);
+        params.push('expressOrder='+expressOrder);
+        params.push('orderId='+orderId);
         _this.$axios
-          .post("delivery", {
-            company: company,
-            expressOrder: expressOrder,
-            orderId: orderId
-          })
+          .post("delivery?"+params.join('&'))
           .then(result => {
             let res = result.data;
             switch (res.code) {
@@ -296,29 +296,27 @@
       showViewModal: function (index) {
         this.curIndex = index;
         let cur = this.list[index];
-        this.getExpressOrder(cur.orderId,function(result){
-          this.view = result;
-          $("#modal-send-view").modal("show");
-        });
+        this.getExpressOrder(cur.id);
       },
-      getExpressOrder:function(orderId,cb){
+      getExpressOrder:function(orderId){
+          let _this = this;
           _this.$axios
-          .get("delivery", {
-            orderId: orderId
-          })
+          .get("delivery?orderId="+orderId)
           .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                   cb&&cb(res.data);
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
+            $("#modal-send-view").modal("show");
+            _this.view = result.data;
+            // let res = result.data;
+            // switch (res.code) {
+            //   case 200:
+            //     {
+            //        cb&&cb(res.data);
+            //     }
+            //     break;
+            //   default:
+            //     {
+            //       _this.$toast.error(res.msg);
+            //     }
+            // }
           })
           .catch(err => {});
       },
@@ -327,25 +325,22 @@
         let company = _this.view.company.trim();
         let expressOrder = _this.view.expressOrder.trim();
         if (company.trim() === '') {
-          _this.$toast.warning("名称不可为空");
+          _this.$toast.warning("快递公司不可为空");
           return false;
         }
         if (expressOrder.trim() === '') {
-          _this.$toast.warning("单号不可为空");
+          _this.$toast.warning("快递单号不可为空");
           return false;
         }
-        let orderId = 0;
-        let curOrder = _this.list[_this.curIndex];
-        if (curOrder) {
-          orderId = curOrder.orderId;
-        }
         _this.loading = true;
+        let params = [];
+        params.push("company=" + company);
+        params.push("expressOrder=" + expressOrder);
+        params.push("id=" + _this.view.id);
+        params.push("orderId=" + _this.view.orderId);
+        
         _this.$axios
-          .put("delivery", {
-            company: company,
-            expressOrder: expressOrder,
-            orderId: orderId
-          })
+          .put("delivery?"+params.join("&"))
           .then(result => {
             let res = result.data;
             switch (res.code) {
@@ -384,7 +379,7 @@
           .get("orders?" + param.join('&'))
           .then(result => {
             let res = result.data;
-            _this.parentTotalPage = res.total;
+            _this.parentTotalPage = res.page;
             let tempList = res.list;
             _this.$lodash.forEach(tempList, function (item) {
               item.timeStr = _this.$moment(item.createDate).format('YYYY/MM/DD HH:mm');
