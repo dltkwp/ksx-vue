@@ -34,11 +34,11 @@
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="date_added">状态</label>
-                    <select class="form-control">
-                      <option>全部</option>
-                      <option>等待发货</option>
-                      <option>已发货</option>
-                      <option>已签收</option>
+                    <select v-model="rearch.status" class="form-control">
+                      <option value="">全部</option>
+                      <option value="WAIT">等待发货</option>
+                      <option value="DELIVERY">已发货</option>
+                      <option value="OVER">已签收</option>
                     </select>
                   </div>
                 </div>
@@ -47,21 +47,22 @@
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="order_id">订单内容</label>
-                    <input type="text" value="" placeholder="搜索产品名称" class="form-control">
+                    <input type="text" value="" placeholder="搜索产品名称" class="form-control" v-model="rearch.content" maxlength="20">
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="status">收货人</label>
-                    <input type="text" value="" placeholder="收货人姓名/电话" class="form-control">
+                    <input type="text" value="" placeholder="收货人姓名/电话" class="form-control" v-model="rearch.recipients" maxlength="20">
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="customer">分销商</label>
-                    <input type="text" value="" placeholder="分销商姓名/电话" class="form-control">
+                    <input type="text" value="" placeholder="分销商姓名/电话" class="form-control" v-model="rearch.distributor" maxlength="20">
                   </div>
                 </div>
+                <button type="button" @click="rearchSubmit()" class="btn btn-primary">Rearch</button>
               </div>
             </div>
             <div class="row">
@@ -170,18 +171,18 @@
                       <form role="form">
                         <div class="form-group">
                           <label>快递公司</label>
-                          <input v-model="view.company" type="text" placeholder="请输入快递公司" class="form-control" maxlength="50">
+                          <input v-bind:readonly="!view.isEdit" v-model="view.company" type="text" placeholder="请输入快递公司" class="form-control" maxlength="50">
                         </div>
                         <div class="form-group">
                           <label>快递单号</label>
-                          <input v-model="view.expressOrder" type="text" placeholder="请输入快递单号" class="form-control" maxlength="50">
+                          <input v-bind:readonly="!view.isEdit" v-model="view.expressOrder" type="text" placeholder="请输入快递单号" class="form-control" maxlength="50">
                         </div>
                       </form>
                     </div>
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="updateSubmit()" class="btn btn-primary">保存</button>
+                  <button v-if="view.isEdit" v-bind:disabled="loading" v-bind:readonly="loading" type="button" @click="updateSubmit()" class="btn btn-primary">保存</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
@@ -197,202 +198,216 @@
 </template>
 
 <script>
-  import {
-    mapActions,
-    mapGetters
-  } from "vuex";
-  import * as types from "@/store/mutation-types.js";
+import { mapActions, mapGetters } from "vuex";
+import * as types from "@/store/mutation-types.js";
 
-  import vMenus from "@/components/menus/menus.vue";
-  import vTop from "@/components/top/top.vue";
-  import vFoot from "@/components/foot/foot.vue";
+import vMenus from "@/components/menus/menus.vue";
+import vTop from "@/components/top/top.vue";
+import vFoot from "@/components/foot/foot.vue";
 
-  import pagination from '@/components/pagination/pagination.vue';
+import pagination from "@/components/pagination/pagination.vue";
 
-  export default {
-    components: {
-      vMenus,
-      vTop,
-      vFoot,
-      pagination
-    },
-    data() {
-      return {
-        loading: false,
-        list: [],
-        parentTotalPage: 0,
-        parentCurrentpage: 1,
-        curIndex: -1,
-        send: {
-          company: '',
-          expressOrder: ''
-        },
-        view: {
-          company: '',
-          expressOrder: '',
-          id: ''
-        }
-      };
-    },
-    mounted() {
+export default {
+  components: {
+    vMenus,
+    vTop,
+    vFoot,
+    pagination
+  },
+  data() {
+    return {
+      loading: false,
+      list: [],
+      parentTotalPage: 0,
+      parentCurrentpage: 1,
+      curIndex: -1,
+      rearch: {
+        st: "",
+        et: "",
+        payType: "",
+        status:"",
+        content:"",
+        recipients:"",
+        distributor:"",
+        isSupplier:1
+      },
+      send: {
+        company: "",
+        expressOrder: ""
+      },
+      view: {
+        company: "",
+        expressOrder: "",
+        id: ""
+      }
+    };
+  },
+  mounted() {
+    this.listData();
+  },
+  methods: {
+    ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    rearchSubmit:function(){
+      this.parentCurrentpage = 1;
       this.listData();
     },
-    methods: {
-      ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-      showSendModal: function (index) {
-        this.curIndex = index;
-        this.send.company = '';
-        this.send.expressOrder = '';
-        $("#modal-send").modal("show");
-      },
-      sendSubmit: function () {
-        let _this = this;
-        let company = _this.send.company.trim();
-        let expressOrder = _this.send.expressOrder.trim();
-        if (company.trim() === '') {
-          _this.$toast.warning("快递公司不可为空");
-          return false;
-        }
-        if (expressOrder.trim() === '') {
-          _this.$toast.warning("快递单号不可为空");
-          return false;
-        }
-        let orderId = 0;
-        let curOrder = _this.list[_this.curIndex];
-        if (curOrder) {
-          orderId = curOrder.id;
-        }
-
-        _this.loading = true;
-        let params  = [];
-        params.push('company='+company);
-        params.push('expressOrder='+expressOrder);
-        params.push('orderId='+orderId);
-        _this.$axios
-          .post("delivery?"+params.join('&'))
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.listData();
-                  $("#modal-send").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      showViewModal: function (index) {
-        this.curIndex = index;
-        let cur = this.list[index];
-        this.getExpressOrder(cur.id);
-      },
-      getExpressOrder:function(orderId){
-          let _this = this;
-          _this.$axios
-          .get("delivery?orderId="+orderId)
-          .then(result => {
-            $("#modal-send-view").modal("show");
-            _this.view = result.data;
-            // let res = result.data;
-            // switch (res.code) {
-            //   case 200:
-            //     {
-            //        cb&&cb(res.data);
-            //     }
-            //     break;
-            //   default:
-            //     {
-            //       _this.$toast.error(res.msg);
-            //     }
-            // }
-          })
-          .catch(err => {});
-      },
-      updateSubmit:function(){
-        let _this = this;
-        let company = _this.view.company.trim();
-        let expressOrder = _this.view.expressOrder.trim();
-        if (company.trim() === '') {
-          _this.$toast.warning("快递公司不可为空");
-          return false;
-        }
-        if (expressOrder.trim() === '') {
-          _this.$toast.warning("快递单号不可为空");
-          return false;
-        }
-        _this.loading = true;
-        let params = [];
-        params.push("company=" + company);
-        params.push("expressOrder=" + expressOrder);
-        params.push("id=" + _this.view.id);
-        params.push("orderId=" + _this.view.orderId);
-        
-        _this.$axios
-          .put("delivery?"+params.join("&"))
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.listData();
-                  $("#modal-send-view").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      parentCallback(cPage) {
-        this.listData();
-      },
-      listData() {
-        let _this = this;
-        let param = []
-        param.push('pageNum=' + _this.parentCurrentpage);
-        param.push('pageSize=' + 15);
-        param.push('isSupplier=1')
-
-        _this.PUSH_LOADING();
-        _this.$axios
-          .get("orders?" + param.join('&'))
-          .then(result => {
-            let res = result.data;
-            _this.parentTotalPage = res.page;
-            let tempList = res.list;
-            _this.$lodash.forEach(tempList, function (item) {
-              item.timeStr = _this.$moment(item.createDate).format('YYYY/MM/DD HH:mm');
-            });
-            _this.list = tempList;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.SHIFT_LOADING();
-          });
+    showSendModal: function(index) {
+      this.curIndex = index;
+      this.send.company = "";
+      this.send.expressOrder = "";
+      $("#modal-send").modal("show");
+    },
+    sendSubmit: function() {
+      let _this = this;
+      let company = _this.send.company.trim();
+      let expressOrder = _this.send.expressOrder.trim();
+      if (company.trim() === "") {
+        _this.$toast.warning("快递公司不可为空");
+        return false;
       }
-    }
-  };
+      if (expressOrder.trim() === "") {
+        _this.$toast.warning("快递单号不可为空");
+        return false;
+      }
+      let orderId = 0;
+      let curOrder = _this.list[_this.curIndex];
+      if (curOrder) {
+        orderId = curOrder.id;
+      }
 
+      _this.loading = true;
+      let params = [];
+      params.push("company=" + company);
+      params.push("expressOrder=" + expressOrder);
+      params.push("orderId=" + orderId);
+      _this.$axios
+        .post("delivery?" + params.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                $("#modal-send").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    showViewModal: function(index) {
+      this.curIndex = index;
+      this.getExpressOrder();
+    },
+    getExpressOrder: function() {
+      let _this = this;
+      let cur = _this.list[_this.curIndex ];
+      let orderId = cur.id
+      _this.$axios
+        .get("delivery?orderId=" + orderId)
+        .then(result => {
+          $("#modal-send-view").modal("show");
+          let data = result.data;
+          data.isEdit = cur.status != "OVER";
+          _this.view = data;
+          // let res = result.data;
+          // switch (res.code) {
+          //   case 200:
+          //     {
+          //        cb&&cb(res.data);
+          //     }
+          //     break;
+          //   default:
+          //     {
+          //       _this.$toast.error(res.msg);
+          //     }
+          // }
+        })
+        .catch(err => {});
+    },
+    updateSubmit: function() {
+      let _this = this;
+      let company = _this.view.company.trim();
+      let expressOrder = _this.view.expressOrder.trim();
+      if (company.trim() === "") {
+        _this.$toast.warning("快递公司不可为空");
+        return false;
+      }
+      if (expressOrder.trim() === "") {
+        _this.$toast.warning("快递单号不可为空");
+        return false;
+      }
+      _this.loading = true;
+      let params = [];
+      params.push("company=" + company);
+      params.push("expressOrder=" + expressOrder);
+      params.push("id=" + _this.view.id);
+      params.push("orderId=" + _this.view.orderId);
+
+      _this.$axios
+        .put("delivery?" + params.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                $("#modal-send-view").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    parentCallback(cPage) {
+      this.parentCurrentpage = cPage;
+      this.listData();
+    },
+    listData() {
+      let _this = this;
+      let param = [];
+      param.push("pageNum=" + _this.parentCurrentpage);
+      param.push("pageSize=" + 15);
+      param.push("isSupplier=1");
+
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("orders?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          _this.parentTotalPage = res.page;
+          let tempList = res.list;
+          _this.$lodash.forEach(tempList, function(item) {
+            item.timeStr = _this
+              .$moment(item.createDate)
+              .format("YYYY/MM/DD HH:mm");
+          });
+          _this.list = tempList;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    }
+  }
+};
 </script>
 
