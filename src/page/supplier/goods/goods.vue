@@ -11,7 +11,7 @@
                   <div class="col-sm-4">
                     <div class="form-group">
                       <label class="control-label" for="product_name">名称</label>
-                      <input type="text" id="product_name" name="product_name" value="" placeholder="名称" class="form-control">
+                      <input type="text" v-model="resarch.productName"  placeholder="名称" class="form-control" maxlength="20">
                     </div>
                   </div>
                   <div class="col-sm-4">
@@ -28,12 +28,13 @@
                     <div class="form-group">
                       <label class="control-label" for="status">状态</label>
                       <select v-model="resarch.status" class="form-control">
-                        <option value="-1" selected="">全部</option>
-                        <option value="1" selected="">在售</option>
+                        <option value="">全部</option>
+                        <option value="1">在售</option>
                         <option value="0">停售</option>
                       </select>
                     </div>
                   </div>
+                <button type="button" @click="rearchSubmit()" class="btn btn-primary">Rearch</button>                  
                 </div>
               </div>
               <div class="ibox float-e-margins">
@@ -112,8 +113,8 @@
           index:-1,
           list: [],
           resarch:{
-            categoriesId:-1,
-            status:-1,
+            categoriesId:"",
+            status:"",
             productName:''
           },
           categoriesIdMap:[],
@@ -123,12 +124,16 @@
         };
       },
       mounted() {
-        this.resarch.status = -1;
+        this.resarch.status = "";
         this.categoryListData();
         this.listData();
       },
       methods: {
         ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+        rearchSubmit:function(){
+          this.parentCurrentpage = 1;
+          this.listData();
+        },
         parentCallback(cPage)  {
           this.parentCurrentpage = cPage;
           this.listData();
@@ -168,14 +173,14 @@
           let _this = this;
             _this.$axios.get('categories').then((result)=> {
               let tempArr = [];
-              tempArr.push({categoriesName:'全部',id:-1});
+              tempArr.push({categoriesName:'全部',id:""});
               tempArr = tempArr.concat(result.data);
               _this.$lodash.forEach(result.data,function(item){
                  _this.categoriesIdMap[item.id] = item;
               });
 
               _this.categoryList = tempArr;
-              _this.resarch.categoriesId = -1;
+              _this.resarch.categoriesId = "";
             }).catch(err => {});
         },
       }
