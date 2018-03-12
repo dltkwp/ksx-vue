@@ -249,6 +249,7 @@
               minRetailPrice:'',
               stock:'',
               description:'',
+              
               id:''
           },
         };
@@ -318,17 +319,18 @@
                 })
                 .then(result => {
                     let res = result.data;
-                    switch (res.code) {
-                        case 200:
-                        {
-                            _this.$toast.success("操作成功");
-                            _this.save.id = res.id;
-                        }
-                        break;
-                        default: {
-                        _this.$toast.error(res.msg);
-                        }
-                    }
+                    _this.save.id = res.productId;
+                    // switch (res.code) {
+                    //     case 200:
+                    //     {
+                    //         _this.$toast.success("操作成功");
+                    //         _this.save.id = res.productId;
+                    //     }
+                    //     break;
+                    //     default: {
+                    //     _this.$toast.error(res.msg);
+                    //     }
+                    // }
                     _this.loading = false;
                     _this.SHIFT_LOADING();
                 })

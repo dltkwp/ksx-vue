@@ -30,14 +30,14 @@
             <li v-bind:class="{active:childrenKey==='GoodsCategory'}"><router-link to="/v_category">商品分类设置</router-link></li>
           </ul>
         </li>
-        <li> 
+        <li  v-bind:class="{active:parentKey==='Distributor'}"> 
           <a href="javascript:;;">
           <i class="fa fa-sitemap"></i>
-         <span class="nav-label">我是分销商</span> 
-         <span class="fa arrow"></span></a>
+          <span class="nav-label">我是分销商</span> 
+          <span class="fa arrow"></span></a>
           <ul class="nav nav-second-level collapse" style="height: 0px;">
-            <li><a href="order-distributor.html">订单管理</a></li>
-            <li class="active"><a href="member.html">顾客管理</a></li>
+            <li v-bind:class="{active:childrenKey==='DistributorOrder'}"><router-link to="/v_distributor_order">订单管理</router-link></li>            
+            <li ><a href="member.html">顾客管理</a></li>
             <li><a href="product-distributor.html">商品管理</a></li>
           </ul>
         </li>
@@ -55,38 +55,39 @@
 </template>
 
 <script>
-
-
-  import Vue from 'vue';
-  export default {
-    data(){
-      return {
-        parentKey:'Index',
-        childrenKey:'Index',
-        userInfo:{
-          userName:'',
-          userType:''
-        }
+import Vue from "vue";
+export default {
+  data() {
+    return {
+      parentKey: "Index",
+      childrenKey: "Index",
+      userInfo: {
+        userName: "",
+        userType: ""
       }
-    },
-    mounted (){
-      let _this = this;
-      let userInfo = localStorage.getItem('ksx-user-c');
-      if(!_this.$lodash.isEmpty(userInfo)){
-        let u =  JSON.parse(userInfo);
-        _this.userInfo.userName = u.realname;
-        _this.userInfo.userType = u.userType;
-      } else {
-        _this.$axios.get('user').then((result)=> {
-            let res = result.data;
-            localStorage.setItem('ksx-user-c', JSON.stringify(result.data));
-            _this.userInfo.userName = res.realname;
-            _this.userInfo.userType = res.userType;
-        }).catch((err) => {});
-      }
-      let meta = _this.$route.meta;
-      _this.parentKey   = meta.parentKey;
-      _this.childrenKey = meta.childrenKey; 
+    };
+  },
+  mounted() {
+    let _this = this;
+    let userInfo = localStorage.getItem("ksx-user-c");
+    if (!_this.$lodash.isEmpty(userInfo)) {
+      let u = JSON.parse(userInfo);
+      _this.userInfo.userName = u.realname;
+      _this.userInfo.userType = u.userType;
+    } else {
+      _this.$axios
+        .get("user")
+        .then(result => {
+          let res = result.data;
+          localStorage.setItem("ksx-user-c", JSON.stringify(result.data));
+          _this.userInfo.userName = res.realname;
+          _this.userInfo.userType = res.userType;
+        })
+        .catch(err => {});
     }
-  };
+    let meta = _this.$route.meta;
+    _this.parentKey = meta.parentKey;
+    _this.childrenKey = meta.childrenKey;
+  }
+};
 </script>

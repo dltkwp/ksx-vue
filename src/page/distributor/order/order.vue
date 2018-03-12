@@ -23,11 +23,11 @@
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="date_added">支付方式</label>
-                    <select  v-model="rearch.payType" class="form-control">
-                      <option value="">全部</option>
-                      <option value="">暂未付款</option>
-                      <option value="alipay">支付宝</option>
-                      <option value="wepay">微信</option>
+                    <select class="form-control">
+                      <option>全部</option>
+                      <option>暂未付款</option>
+                      <option>支付宝</option>
+                      <option>微信</option>
                     </select>
                   </div>
                 </div>
@@ -47,19 +47,19 @@
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="order_id">订单内容</label>
-                    <input type="text" placeholder="搜索产品名称" class="form-control" v-model="rearch.content" maxlength="20">
+                    <input type="text" value="" placeholder="搜索产品名称" class="form-control" v-model="rearch.content" maxlength="20">
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="status">收货人</label>
-                    <input type="text" placeholder="收货人姓名/电话" class="form-control" v-model="rearch.recipients" maxlength="20">
+                    <input type="text" value="" placeholder="收货人姓名/电话" class="form-control" v-model="rearch.recipients" maxlength="20">
                   </div>
                 </div>
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="control-label" for="customer">分销商</label>
-                    <input type="text" placeholder="分销商姓名/电话" class="form-control" v-model="rearch.distributor" maxlength="20">
+                    <input type="text" value="" placeholder="分销商姓名/电话" class="form-control" v-model="rearch.distributor" maxlength="20">
                   </div>
                 </div>
                 <button type="button" @click="rearchSubmit()" class="btn btn-primary">Rearch</button>
@@ -114,14 +114,13 @@
                       <div class="img"></div>
                       <div class="empty-info font-grey-salt">暂无数据</div>
                     </div>
-                    <pagination  :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
+                    <pagination :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 发货与更新物流信息 -->
           <div id="modal-send" class="modal fade" aria-hidden="true" style="display: none;">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -189,74 +188,8 @@
               </div>
             </div>
           </div>
-          <!-- 手动新增加订单 -->
-          <div id="order-add" class="modal fade" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  <h4 class="modal-title">新增订单</h4>
-                </div>
-                <div class="modal-body">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <form role="form">
-                        <div class="form-group">
-                          <label>收货人</label>
-                          <input type="text" placeholder="请输入收货人" class="form-control">
-                        </div>
-                        <div class="form-group">
-                          <label>收货电话</label>
-                          <input type="text" placeholder="请输入收货电话" class="form-control">
-                        </div>
-                        <div class="form-group">
-                          <label>收货地址</label>
-                          <input type="text" placeholder="请输入收货地址" class="form-control">
-                        </div>
-                        <div class="form-group">
-                          <label>订单内容</label>
-                        <textarea class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                          <label>供应商</label>
-                      <select class="form-control">
-                        <option>供应商1</option>
-                        <option>供应商2</option>
-                      </select>
-                        </div>
-                        <div class="form-group">
-                          <label>支付方式</label>
-                          <div class="col-sm-12 m-b-md ">
-                              <label class="radio-inline">
-                                <input type="radio" value="option1" id="inlineCheckbox1">
-                                暂未付款 </label>
-                              <label class="radio-inline">
-                                <input type="radio" value="option1" id="inlineCheckbox1">
-                                微信 </label>
-                              <label class="radio-inline">
-                                <input type="radio" value="option1" id="inlineCheckbox1">
-                                支付宝 </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                          <label>微信账号/支付宝账号</label>
-                          <input type="text" value="123459791" class="form-control" disabled>
-                        </div>
-                        <div class="form-group">
-                          <label>支付金额</label>
-                          <input type="text" placeholder="请输入收货地址" class="form-control">
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-primary">保存</button>
-                  <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-                </div>
-              </div>
-            </div>
-          </div>
+
+
         </div>
       </div>
     </div>
@@ -292,11 +225,11 @@ export default {
         st: "",
         et: "",
         payType: "",
-        status: "",
-        content: "",
-        recipients: "",
-        distributor: "",
-        isSupplier: 1
+        status:"",
+        content:"",
+        recipients:"",
+        distributor:"",
+        isSupplier:0
       },
       send: {
         company: "",
@@ -306,14 +239,6 @@ export default {
         company: "",
         expressOrder: "",
         id: ""
-      },
-      order:{
-        recipients:"",
-        recipientsPhone:"",
-        recipientsAddress:"",
-        content:"",
-        payType:"",
-        payment:""
       }
     };
   },
@@ -322,12 +247,9 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-    rearchSubmit: function() {
+    rearchSubmit:function(){
       this.parentCurrentpage = 1;
       this.listData();
-    },
-    showOrderSave:function(){
-       $("#order-add").madal("show");
     },
     showSendModal: function(index) {
       this.curIndex = index;
@@ -388,8 +310,8 @@ export default {
     },
     getExpressOrder: function() {
       let _this = this;
-      let cur = _this.list[_this.curIndex];
-      let orderId = cur.id;
+      let cur = _this.list[_this.curIndex ];
+      let orderId = cur.id
       _this.$axios
         .get("delivery?orderId=" + orderId)
         .then(result => {
@@ -465,28 +387,13 @@ export default {
       param.push("pageNum=" + _this.parentCurrentpage);
       param.push("pageSize=" + 15);
       param.push("isSupplier=1");
-      if (_this.rearch.payType) {
-        param.push("payType=" + _this.rearch.payType);
-      }
-      if (_this.rearch.status) {
-        param.push("status=" + _this.rearch.status);
-      }
-      if (_this.rearch.content) {
-        param.push("content=" + _this.rearch.content);
-      }
-      if (_this.rearch.recipients) {
-        param.push("recipients=" + _this.rearch.recipients);
-      }
-      if (_this.rearch.distributor) {
-        param.push("distributor=" + _this.rearch.distributor);
-      }
 
       _this.PUSH_LOADING();
       _this.$axios
         .get("orders?" + param.join("&"))
         .then(result => {
           let res = result.data;
-          _this.parentTotalPage = res.pages;
+          _this.parentTotalPage = res.page;
           let tempList = res.list;
           _this.$lodash.forEach(tempList, function(item) {
             item.timeStr = _this
