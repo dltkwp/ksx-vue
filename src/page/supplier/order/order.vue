@@ -495,7 +495,6 @@ export default {
           });
           _this.list = tempList;
           _this.SHIFT_LOADING();
-          console.log("sdfas");
         })
         .catch(err => {
           _this.SHIFT_LOADING();
