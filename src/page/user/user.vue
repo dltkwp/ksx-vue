@@ -158,7 +158,6 @@ export default {
       let phone = _this.baseInfo.phone.trim();
       let wechart = _this.baseInfo.wechart.trim();
       let alipay = _this.baseInfo.alipay.trim();
-      let phonePattern = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
       if (_this.$lodash.isEmpty(realname)) {
         _this.$toast.warning("姓名不可为空");
         return false;
@@ -167,7 +166,7 @@ export default {
         _this.$toast.warning("手机号不可为空");
         return false;
       }
-      if(!phonePattern.test(phone)){
+      if(!mobileValidate(phone)){
         _this.$toast.warning("手机号格式不正确");
         return false;
       }

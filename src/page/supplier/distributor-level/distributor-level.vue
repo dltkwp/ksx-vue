@@ -26,7 +26,7 @@
                           </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="(item,index) in list">
+                        <tr v-for="(item,index) in list" :key="index">
                           <td>{{index + 1}}</td>
                           <td>{{item.levelName}}</td>
                           <td>{{item.discount}}折</td>

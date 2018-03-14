@@ -170,6 +170,7 @@ h5 {
 .nav-header {
   padding: 33px 25px;
   background-color: #2f4050;
+  background-image: url("patterns/header-profile.png");
 }
 .pace-done .nav-header {
   transition: all 0.4s;
@@ -3492,6 +3493,9 @@ body.full-height-layout #page-wrapper {
 }
 #page-wrapper {
   min-height: auto;
+}
+body.boxed-layout {
+  background: url('patterns/shattered.png');
 }
 body.boxed-layout #wrapper {
   background-color: #2f4050;
@@ -7710,12 +7714,14 @@ body.rtls.top-navigation .footer.fixed {
 }
 .blue-skin {
   font-weight: 600;
+  background: url("patterns/header-profile-skin-1.png") repeat scroll 0 0;
 }
 .blue-skin:hover {
   background: #0d8ddb;
 }
 .yellow-skin {
   font-weight: 600;
+  background: url("patterns/header-profile-skin-3.png") repeat scroll 0 100%;
 }
 .yellow-skin:hover {
   background: #ce8735;
@@ -7723,6 +7729,10 @@ body.rtls.top-navigation .footer.fixed {
 .ultra-skin {
   padding: 20px 10px;
   font-weight: 600;
+  background: url("patterns/3.png") repeat scroll 0 0;
+}
+.ultra-skin:hover {
+  background: url("patterns/4.png") repeat scroll 0 0;
 }
 /*
  *
@@ -7744,6 +7754,7 @@ body.rtls.top-navigation .footer.fixed {
 }
 .skin-1 .nav-header {
   background-color: #0e9aef;
+  background-image: url('patterns/header-profile-skin-1.png');
 }
 .skin-1.mini-navbar .nav-second-level {
   background: #3e495f;
@@ -7849,6 +7860,7 @@ body.skin-2 {
 }
 .skin-2 .nav-header {
   background-color: #23c6c8;
+  background-image: url('patterns/header-profile-skin-2.png');
 }
 .skin-2.mini-navbar .nav-second-level {
   background: #ededed;
@@ -8001,6 +8013,7 @@ body.boxed-layout.skin-3 #wrapper {
 }
 .skin-3 .nav-header {
   background-color: #ecba52;
+  background-image: url('patterns/header-profile-skin-3.png');
 }
 .skin-3.mini-navbar .nav-second-level {
   background: #3e2c42;
@@ -8090,7 +8103,9 @@ body.md-skin {
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #ffffff;
 }
-
+.md-skin .nav-header {
+  background: url("patterns/4.png") no-repeat;
+}
 .md-skin .label,
 .md-skin .badge {
   font-family: 'Roboto';
@@ -8540,4 +8555,32 @@ body.md-skin {
 
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
 	vertical-align: middle;
+}
+
+.search-box{
+	display: inline-block;
+	width:350px;
+	vertical-align: middle;
+}
+
+.empty {
+  padding: 30px 0 0 0;
+  width: 100%;
+  text-align: center;
+}
+
+.empty .img {
+  display: block;
+  margin: 20px auto 0 auto;
+  width: 187px;
+  height: 150px;
+  background: url(../img/empty.png);
+  background-size: 100% 100%;
+}
+
+.empty-info {
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
 }
