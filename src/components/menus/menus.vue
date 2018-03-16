@@ -10,9 +10,9 @@
                   <strong class="font-bold">{{userInfo.userName}}</strong>
                 </span> 
                 <span class="text-muted text-xs block">{{userInfo.userType===1?'供应商':'分销商'}} <b class="caret"></b></span> </span> </a>
-            <ul class="dropdown-menu animated fadeInRight m-t-xs">
-              <li><a href="javascript:;;">退出</a></li>
-            </ul>
+                <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                  <li><a @click="gotoLogout()" href="javascript:;;">退出</a></li>
+                </ul>
           </div>
           <div class="logo-element"> KSX </div>
         </li>
@@ -56,6 +56,9 @@
 
 <script>
 import Vue from "vue";
+import { mapActions, mapGetters } from "vuex";
+import * as types from "@/store/mutation-types.js";
+
 export default {
   data() {
     return {
@@ -88,6 +91,24 @@ export default {
     let meta = _this.$route.meta;
     _this.parentKey = meta.parentKey;
     _this.childrenKey = meta.childrenKey;
+  },
+  methods: {
+    ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    gotoLogout: function() {
+      let _this = this;
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("logout")
+        .then(result => {
+          localStorage.setItem("ksx-user-c", ""); //清理user信息,登陆后如果为空则再次查询
+          localStorage.setItem("ksx-token-c", "");
+          window.location.href = "/v_login";
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    }
   }
 };
 </script>

@@ -97,7 +97,6 @@
                                 <label>等级*</label>
                                 <select class="form-control">
                                 <option></option>
-                                
                                 <option>一级分销商</option>
                                 <option>二级分销商</option>
                                 <option>三级分销商</option>
@@ -182,7 +181,7 @@ export default {
       this.listData();
     },
     showAddModal:function(){
-        
+        $("#distroibutor-add").modal("show");
     },
     rearchSubmit:function(){
         this.parentCurrentpage = 1;

@@ -65,14 +65,18 @@
                           <td>
                             {{item.payType=='none'?'':item.payType}}
                             <span class="label label-danger" v-if="item.payType=='none'">暂未付款</span>
+                            <span class="label label-danger" v-if="item.payType=='check'">付款待审核</span>
                           </td>
                           <td>
                             <span class="label label-warning" v-if="item.status=='WAIT'">等待发货</span>
                             <span class="label label-primary" v-if="item.status=='DELIVERY'">已发货</span>
                           </td>
                           <td>
+                            <div class="btn btn-sm btn-primary" @click="showPayModal(index)">收款</div>
+						                <div class="btn btn-sm btn-default" @click="showChangePriceodal(index)">改价</div>
+                            <div class="btn btn-sm btn-default" @click="showDetailModal(index)">详情</div>
                             <div class="btn btn-sm btn-primary" @click="showSendModal(index)" v-if="item.status=='WAIT'">发货</div>
-                            <div class="btn btn-sm btn-default" @click="showViewModal(index)" v-if="item.status=='DELIVERY'">查看物流单号</div>
+                            <div class="btn btn-sm btn-default" @click="showViewModal(index)" v-if="item.status=='DELIVERY'">物流</div>
                           </td>
                         </tr>
                       </tbody>
@@ -86,6 +90,132 @@
             </div>
             
           </div>
+
+          <!-- 改动价格 开始-->
+          <div id="edit-price" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title">订单改价</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form role="form">
+                        <div class="form-group">
+                          <label>订单原价</label>
+                          <input type="text" value="500.00" class="form-control" disabled="">
+                        </div>
+                        <div class="form-group">
+                          <label>修改价格为</label>
+                          <input type="text" placeholder="请输入价格" class="form-control">
+                        </div>
+                        <div class="form-group">
+                          <label>备注</label>
+                          <textarea class="form-control"></textarea>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary">保存</button>
+                  <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 改动价格 结束-->
+          <!-- 订单详情  开始-->
+          <div id="order-detail" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title">订单详情</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form role="form" class="form-horizontal">
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货人</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="张三" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货电话</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="15242612898" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货地址</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="高新园区招商兰溪谷" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">订单内容</label>
+                          <div class="col-sm-10">
+                            <textarea class="form-control" disabled="">麦顿金典1袋</textarea>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">分销商</label>
+                          <div class="col-sm-10">
+                            <select class="form-control" disabled="">
+                              <option>分销商1</option>
+                            
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">支付方式</label>
+                          <div class="col-sm-10">
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              暂未付款 </label>
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              微信 </label>
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              支付宝 </label>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">微信账号/支付宝账号</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="123459791" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">支付金额</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="100" class="form-control">
+                          </div>
+                        </div>
+                  <div class="form-group">
+                          <label class="col-sm-2 control-label">付款截图</label>
+                          <div class="col-sm-10">
+                              <img src="img/gallery/2s.jpg" class="img-lg" data-toggle="modal" href="#look-img">
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                
+                  <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 订单详情  结束-->
 
           <!-- 发货与更新物流信息 -->
           <div id="modal-send" class="modal fade" aria-hidden="true" style="display: none;">
@@ -121,7 +251,6 @@
               </div>
             </div>
           </div>
-
           <div id="modal-send-view" class="modal fade" aria-hidden="true" style="display: none;">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -336,7 +465,8 @@ export default {
         payType: "",
         account: "",
         payment: ""
-      }
+      },
+      detai:{}
     };
   },
   mounted() {
@@ -344,6 +474,16 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    showPayModal:function(index){
+      $("#").modal("show");
+    },
+    showChangePriceodal:function(index){
+      $("#edit-price").modal("show");
+    },
+    showDetailModal:function(index){
+      $("#order-detail").modal("show");
+      this.getDetail(this.list[index].id);
+    },
     advRearchSubmit:function(){
       this.parentCurrentpage = 1;
       this.listData();
@@ -585,6 +725,27 @@ export default {
     parentCallback(cPage) {
       this.parentCurrentpage = cPage;
       this.listData();
+    },
+    getDetail:function(orderId){
+      let _this = this;
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("orders/" + orderId)
+        .then(result => {
+          let res = result.data;
+          _this.parentTotalPage = res.pages;
+          let tempList = res.list;
+          _this.$lodash.forEach(tempList, function(item) {
+            item.timeStr = _this
+              .$moment(item.createDate)
+              .format("YYYY/MM/DD HH:mm");
+          });
+          _this.list = tempList;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
     },
     listData() {
       let _this = this;
