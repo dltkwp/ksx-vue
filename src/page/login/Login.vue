@@ -25,7 +25,6 @@
 </template>
 
 <script>
-   import Vue from 'vue'
    import { mapActions , mapGetters} from 'vuex'
    import * as types from '@/store/mutation-types.js'
 
@@ -35,6 +34,10 @@
           userName:'',
           password:''
        } 
+      },
+      mounted(){
+        this.SHIFT_LOADING();
+                
       },
       methods: {
          ...mapActions([types.LOADING.PUSH_LOADING,types.LOADING.SHIFT_LOADING]),
