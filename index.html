@@ -29,6 +29,10 @@
             var　 pattern = /^(((13[0-9]{1})|(14[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
             return pattern.test(v);
         }
+        function pwdValidate(v){
+            var pattern = /^[a-zA-Z0-9]{8,20}$/;
+            return pattern.test(v);
+        }
     </script>
 </head>
 

@@ -81,10 +81,7 @@
                         </tr>
                       </tbody>
                     </table>
-                    <div class="empty" v-if="parentTotalPage==0">
-                      <div class="img"></div>
-                      <div class="empty-info font-grey-salt">暂无数据</div>
-                    </div>
+                    <v-empty :isShow="parentTotalPage==0"></v-empty>
                     <pagination  :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
               </div>
             </div>
@@ -209,7 +206,6 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
@@ -420,6 +416,7 @@ import * as types from "@/store/mutation-types.js";
 import vMenus from "@/components/menus/menus.vue";
 import vTop from "@/components/top/top.vue";
 import vFoot from "@/components/foot/foot.vue";
+import vEmpty from "@/components/empty/empty.vue";
 
 import pagination from "@/components/pagination/pagination.vue";
 
@@ -428,6 +425,7 @@ export default {
     vMenus,
     vTop,
     vFoot,
+    vEmpty,
     pagination
   },
   data() {
