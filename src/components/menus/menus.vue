@@ -16,7 +16,7 @@
           </div>
           <div class="logo-element"> KSX </div>
         </li>
-        <li  v-bind:class="{active:parentKey==='Supplier'}"> 
+        <li  v-if="uType=='supplier'||uType=='all'"  v-bind:class="{active:parentKey==='Supplier'}"> 
           <a href="javascript:;;">
             <i class="fa fa-sitemap"></i> 
             <span class="nav-label">我是供应商</span> 
@@ -30,7 +30,7 @@
             <li v-bind:class="{active:childrenKey==='GoodsCategory'}"><router-link to="/v_category">商品分类设置</router-link></li>
           </ul>
         </li>
-        <li  v-bind:class="{active:parentKey==='Distributor'}"> 
+        <li  v-if="uType=='distributor'||uType=='all'"   v-bind:class="{active:parentKey==='Distributor'}"> 
           <a href="javascript:;;">
           <i class="fa fa-sitemap"></i>
           <span class="nav-label">我是分销商</span> 
@@ -64,11 +64,16 @@ export default {
       userInfo: {
         userName: "",
         userType: ""
-      }
+      },
+      uType:'', // supplier: 供应商  distributor： 分销商  all： 供应商
     };
   },
   mounted() {
+
     let _this = this;
+    let uType = localStorage.getItem('ksx-user-type',  'distributor')
+    _this.uType = uType;
+
     let userInfo = localStorage.getItem("ksx-user-c");
     if (!_this.$lodash.isEmpty(userInfo)) {
       let u = JSON.parse(userInfo);

@@ -1,10 +1,9 @@
 import Vue from 'vue'
 
-import AxiosPlugin from './axios.js';
-Vue.use(AxiosPlugin);
+import LodashPlugin from './lodash.js'
+import AxiosPlugin from './axios.js'
+import MomentPlugin from './moment.js'
 
-import LodashPlugin from './lodash.js';
-Vue.use(LodashPlugin);
-
-import MomentPlugin from './moment.js';
-Vue.use(MomentPlugin);
+Vue.use(AxiosPlugin)
+Vue.use(LodashPlugin)
+Vue.use(MomentPlugin)

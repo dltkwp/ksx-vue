@@ -26,6 +26,11 @@
  
  export default {
   name: 'App',
+  data() {
+    return {
+      userType:''
+    }
+  },
   components: {
     vLoading
   },

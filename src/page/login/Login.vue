@@ -60,9 +60,19 @@
                 var res = result.data;
                 switch (res.code) {
                     case 1000200: {
+                        
                         localStorage.setItem('ksx-user-c', ''); //清理user信息,登陆后如果为空则再次查询
                         localStorage.setItem('ksx-token-c', res.token);
-                        window.location.href = '/v_index';
+                        
+                        let isSupplier = _this.$lodash.find(res.roleList,{roleName:'dealer'}) // 供应商 
+                        let isDistributor = _this.$lodash.find(res.roleList,{roleName:'dealer'}) //  分销商 
+                        if(isSupplier){
+                            localStorage.setItem('ksx-user-type',  isDistributor? "all" : 'supplier'); 
+                            window.location.href = '/v_supplier_order'
+                        }else if(isDistributor){
+                            localStorage.setItem('ksx-user-type',  'distributor'); 
+                            window.location.href = '/v_distributor_order'
+                        }
                     } break;
                     default: {
                         _this.$toast.error(res.msg);
