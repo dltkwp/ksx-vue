@@ -255,6 +255,7 @@
         };
       },
       mounted() {
+        this.SHIFT_LOADING();
         this.categoryListData();
       },
       methods: {

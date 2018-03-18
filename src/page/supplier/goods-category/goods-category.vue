@@ -153,6 +153,7 @@ export default {
     };
   },
   mounted() {
+    this.SHIFT_LOADING();
     this.save.categoriesName = "";
     this.edit.categoriesName = "";
     this.edit.id = 0;

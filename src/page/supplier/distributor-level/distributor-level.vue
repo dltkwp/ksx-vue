@@ -179,6 +179,8 @@
       };
     },
     mounted() {
+      this.SHIFT_LOADING();
+
       this.save.levelName = "";
       this.save.discount = "";
       this.save.initialFee = "";

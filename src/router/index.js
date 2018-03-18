@@ -9,6 +9,7 @@ import DistributorLevel from './distributor-level'
 import Goods from './distributor-goods'
 import Order from './order'
 import Distributor from './supplier-distributor'
+import DistributorCustomer from './distributor-customer.js'
 
 Vue.use(Router)
 
@@ -28,7 +29,10 @@ let router = new Router({
       childrenKey: 'Index'
     }
   }
-  ].concat(User).concat(GoodsCategory).concat(DistributorLevel).concat(Goods).concat(Order).concat(Distributor)
+  ].concat(User).concat(GoodsCategory)
+    .concat(DistributorLevel).concat(Goods)
+    .concat(Order).concat(Distributor)
+    .concat(DistributorCustomer)
 })
 
 router.beforeEach((to, from, next) => {

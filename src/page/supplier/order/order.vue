@@ -310,11 +310,11 @@
                           </div>
                           <div class="form-group">
                             <label>分销商</label>
-                        <select class="form-control">
-                          <option></option>
-                          <option>分销商1</option>
-                          <option>分销商2</option>
-                        </select>
+                             <select v-model="distributorId" class="form-control">
+                                <option v-for="(item,index) in distributorList " :key="index" v-bind:value="item.id">
+                                  {{ item.username }}
+                                </option>
+                            </select>
                           </div>
                           <div class="form-group">
                             <label>支付方式</label>
@@ -464,11 +464,15 @@ export default {
         account: "",
         payment: ""
       },
-      detai:{}
+      detai:{},
+      distributorList:[], //新增订单时分销商的列表
+      distributorId:'', //新增订单时所选择的
     };
   },
   mounted() {
+    this.SHIFT_LOADING();
     this.listData();
+    this.getDistributorList();
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
@@ -784,6 +788,23 @@ export default {
         })
         .catch(err => {
           _this.SHIFT_LOADING();
+        });
+    },
+    getDistributorList:function(){
+      let _this  = this;
+       let param = [];
+      param.push("pageNum=1");
+      param.push("pageSize=1000");
+      _this.$axios
+        .get("user/dealer?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          _this.distributorList = res.list;
+          if(res.list.length>0){
+            _this.distributorId = res.list[0].id;
+          }
+        })
+        .catch(err => {
         });
     }
   }

@@ -167,6 +167,7 @@ export default {
     };
   },
   mounted() {
+    this.SHIFT_LOADING();
     this.getLevelList();
     this.parentCurrentpage = 1;
     this.listData();

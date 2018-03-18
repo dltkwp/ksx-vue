@@ -124,6 +124,7 @@
         };
       },
       mounted() {
+        this.SHIFT_LOADING();
         this.resarch.status = "";
         this.categoryListData();
         this.listData();

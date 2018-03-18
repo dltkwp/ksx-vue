@@ -36,8 +36,8 @@
           <span class="nav-label">我是分销商</span> 
           <span class="fa arrow"></span></a>
           <ul class="nav nav-second-level collapse" style="height: 0px;">
-            <li v-bind:class="{active:childrenKey==='DistributorOrder'}"><router-link to="/v_distributor_order">订单管理</router-link></li>            
-            <li ><a href="member.html">顾客管理</a></li>
+            <li v-bind:class="{active:childrenKey==='DistributorOrder'}"><router-link to="/v_distributor_order">订单管理</router-link></li>     
+            <li v-bind:class="{active:childrenKey==='DistributorCustomer'}"><router-link to="/v_distributor_customer">顾客管理</router-link></li>            
             <li><a href="product-distributor.html">商品管理</a></li>
           </ul>
         </li>

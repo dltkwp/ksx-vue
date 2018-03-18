@@ -37,7 +37,6 @@
       },
       mounted(){
         this.SHIFT_LOADING();
-                
       },
       methods: {
          ...mapActions([types.LOADING.PUSH_LOADING,types.LOADING.SHIFT_LOADING]),

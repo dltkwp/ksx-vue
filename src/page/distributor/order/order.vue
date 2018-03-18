@@ -243,6 +243,7 @@ export default {
     };
   },
   mounted() {
+    this.SHIFT_LOADING();
     this.listData();
   },
   methods: {
