@@ -6,8 +6,8 @@
         <div class="wrapper wrapper-content animated fadeInRight">
           <div class="row">
             <div class="col-lg-12">
-              <div class="ibox-content m-b-sm border-bottom">
-                <div class="row">
+              <!-- <div class="ibox-content m-b-sm border-bottom">
+                 <div class="row">
                   <div class="col-sm-4">
                     <div class="form-group">
                       <label class="control-label" for="product_name">名称</label>
@@ -36,14 +36,30 @@
                   </div>
                 <button type="button" @click="rearchSubmit()" class="btn btn-primary">Rearch</button>                  
                 </div>
-              </div>
+              </div> -->
               <div class="ibox float-e-margins">
                 <div class="ibox-title"> 商品列表 </div>
                 <div class="ibox-content">
-                  <div class="row">
-                    <div class="col-sm-9 m-b-xs"> 
-                      <router-link class="btn btn-primary btn-sm" to="/v_supplier_goods_save">新增商品</router-link>
-                    </div>
+                  <div class="row m-b-sm ">
+                  <div class="col-lg-6">
+                    <router-link class="btn btn-primary btn-sm" to="/v_supplier_goods_save">新增商品</router-link>
+                  </div>
+                  <div class="col-lg-6 text-right">
+                          <div class="btn-group btn-group-sm">
+                          <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false">{{resarch.curCategory.categoriesName}} <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                              <li @click="categroyChange(index)" v-for="(item,index) in categoryList" :key="index" ><a href="javascript:;;">{{ item.categoriesName }}</a></li>
+                            </ul>
+                          </div>
+                          <div class="search-box">
+                          <div class="input-group">
+                            <input type="text" placeholder="搜索商品名称或编号" class="input-sm form-control"  v-model="resarch.productName" maxlength="20">
+                            <span class="input-group-btn">
+                            <button type="button" class="btn btn-sm btn-primary" @click="rearchSubmit()" > 搜索</button>
+                            </span></div>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-default " data-toggle="modal" href="#search-more">高级搜索</button>
+                          </div>
                   </div>
                   <div class="table-responsive">
                     <table class="table table-striped">
@@ -65,7 +81,7 @@
                       </thead>
                       <tbody>
                         <tr v-for="(item,index) in list" :key="index">
-                          <td> {{index + 1}}</td>
+                          <td> {{item.productNo}}</td>
                           <td><img src="img/gallery/2s.jpg" class="img-lg"> {{item.productName}} </td>
                           <td> {{item.categoriesName}} </td>
                           <td> ￥{{item.minRetailPrice}} </td>
@@ -80,6 +96,7 @@
                         </tr>
                       </tbody>
                     </table>
+                    <v-empty :isShow="parentTotalPage==0"></v-empty>
                     <pagination :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
                   </div>
                 </div>
@@ -88,102 +105,154 @@
           </div>
         </div>
       </div>
+      <div id="search-more" class="modal fade" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">高级搜索</h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-sm-12">
+                  <form class="form-horizontal">
+                    <div class="form-group">
+                      <label class="col-lg-2 control-label">状态</label>
+                      <div class="col-lg-4">
+                        <select v-model="resarch.status" class="form-control">
+                          <option value="">全部</option>
+                          <option value="1">在售</option>
+                          <option value="0">停售</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button @click="advRearchSubmit()" type="button" class="btn btn-primary">保存</button>
+              <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <v-foot></v-foot>
    </div>
 </template>
 <script>
-    import { mapActions, mapGetters } from "vuex";
-    import * as types from "@/store/mutation-types.js";
+import { mapActions, mapGetters } from "vuex";
+import * as types from "@/store/mutation-types.js";
 
-    import vMenus from "@/components/menus/menus.vue";
-    import vTop from "@/components/top/top.vue";
-    import vFoot from "@/components/foot/foot.vue";
-    import pagination from '@/components/pagination/pagination.vue';
+import vMenus from "@/components/menus/menus.vue";
+import vTop from "@/components/top/top.vue";
+import vFoot from "@/components/foot/foot.vue";
+import pagination from "@/components/pagination/pagination.vue";
+import vEmpty from "@/components/empty/empty.vue";
 
-    export default {
-      components: {
-        vMenus,
-        vTop,
-        vFoot,
-        pagination
+export default {
+  components: {
+    vMenus,
+    vTop,
+    vFoot,
+    vEmpty,
+    pagination
+  },
+  data() {
+    return {
+      loading: false,
+      index: -1,
+      list: [],
+      resarch: {
+        categoriesId: "",
+        curCategory:{},
+        status: "",
+        productName: ""
       },
-      data() {
-        return {
-          loading: false,
-          index:-1,
-          list: [],
-          resarch:{
-            categoriesId:"",
-            status:"",
-            productName:''
-          },
-          categoriesIdMap:[],
-          categoryList:[],
-          parentTotalPage: 0,
-          parentCurrentpage: 1
-        };
-      },
-      mounted() {
-        this.SHIFT_LOADING();
-        this.resarch.status = "";
-        this.categoryListData();
-        this.listData();
-      },
-      methods: {
-        ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-        rearchSubmit:function(){
-          this.parentCurrentpage = 1;
-          this.listData();
-        },
-        parentCallback(cPage)  {
-          this.parentCurrentpage = cPage;
-          this.listData();
-        },
-        listData() {
-          let _this = this;
-          _this.PUSH_LOADING();
-          let param = []
-          param.push('pageNum=' + _this.parentCurrentpage);
-          param.push('pageSize=' + 15);
-          if(!_this.$lodash.isEmpty(_this.resarch.productName)){
-            param.push('productName=' + _this.resarch.productName);
-          }
-          if(parseInt(_this.resarch.categoriesId) >-1){
-            param.push('categoriesId=' + _this.resarch.categoriesId);
-          }
-          if(parseInt(_this.resarch.status) >-1){
-            param.push('status=' + _this.resarch.status);
-          }
-          _this.$axios
-            .get("products?"+param.join('&'))
-            .then(result => {
-              let res = result.data;
-              _this.parentTotalPage = res.pages;
-              _this.$lodash.forEach(res.list,function(item){
-                  let _category = _this.categoriesIdMap[item.categoriesId];
-                  item.categoriesName = _category?_category.categoriesName:'';
-              });
-              _this.list = res.list;
-              _this.SHIFT_LOADING();
-            })
-            .catch(err => {
-              _this.SHIFT_LOADING();
-            });
-        },
-        categoryListData(){
-          let _this = this;
-            _this.$axios.get('categories').then((result)=> {
-              let tempArr = [];
-              tempArr.push({categoriesName:'全部',id:""});
-              tempArr = tempArr.concat(result.data);
-              _this.$lodash.forEach(result.data,function(item){
-                 _this.categoriesIdMap[item.id] = item;
-              });
-
-              _this.categoryList = tempArr;
-              _this.resarch.categoriesId = "";
-            }).catch(err => {});
-        },
-      }
+      categoriesIdMap: [],
+      categoryList: [],
+      parentTotalPage: 0,
+      parentCurrentpage: 1
     };
+  },
+  mounted() {
+    this.SHIFT_LOADING();
+    this.resarch.status = "";
+    this.categoryListData();
+    this.listData();
+  },
+  methods: {
+    ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    advRearchSubmit:function(){
+      this.parentCurrentpage = 1;
+      this.listData();
+      $("#search-more").modal("hide");
+    },
+    showAdv:function(){
+      $("#search-more").modal("show");
+    },
+    rearchSubmit: function() {
+      this.parentCurrentpage = 1;
+      this.listData();
+    },
+    parentCallback(cPage) {
+      this.parentCurrentpage = cPage;
+      this.listData();
+    },
+    listData() {
+      let _this = this;
+      _this.PUSH_LOADING();
+      let param = [];
+      param.push("pageNum=" + _this.parentCurrentpage);
+      param.push("pageSize=" + 15);
+      if (!_this.$lodash.isEmpty(_this.resarch.productName)) {
+        param.push("queryKey=" + _this.resarch.productName);
+      }
+      if (this.resarch.curCategory.id) {
+        param.push("categoriesId=" + this.resarch.curCategory.id);
+      }
+      if (parseInt(_this.resarch.status) > -1) {
+        param.push("status=" + _this.resarch.status);
+      }
+      _this.$axios
+        .get("products?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          _this.parentTotalPage = res.pages;
+          _this.$lodash.forEach(res.list, function(item) {
+            let _category = _this.categoriesIdMap[item.categoriesId];
+            item.categoriesName = _category ? _category.categoriesName : "";
+          });
+          _this.list = res.list;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    },
+    categroyChange:function(index){
+      let cur = this.categoryList[index];
+      this.resarch.curCategory = cur;
+       this.parentCurrentpage = 1;
+      this.listData();
+    },
+    categoryListData() {
+      let _this = this;
+      _this.$axios
+        .get("categories")
+        .then(result => {
+          let tempArr = [];
+          tempArr.push({ categoriesName: "全部", id: "" });
+          tempArr = tempArr.concat(result.data);
+          _this.$lodash.forEach(result.data, function(item) {
+            _this.categoriesIdMap[item.id] = item;
+          });
+
+          _this.categoryList = tempArr;
+          this.resarch.curCategory = tempArr[0];
+        })
+        .catch(err => {});
+    }
+  }
+};
 </script>
