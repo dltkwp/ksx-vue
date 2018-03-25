@@ -1,12 +1,11 @@
 /**
  *  分销商的路由设置
  */
-
-// 1: 商品管理
 import DistributorGoods from '@/page/distributor/goods/goods.vue'
 import DistributorGoodsSave from '@/page/distributor/goods/save.vue'
 import DistributorGoodsDetail from '@/page/distributor/goods/detail.vue'
 import DistributorOrder from '@/page/distributor/order/order.vue'
+import DistributorCustomer from '@/page/distributor/customer/customer.vue'
 
 export default [{
   path: '/v_distributor_goods',
@@ -43,5 +42,14 @@ export default [{
     childrenKey: 'DistributorOrder'
   },
   component: DistributorOrder
+},
+{
+  path: '/v_distributor_customer',
+  name: 'DistributorCustomer',
+  meta: {
+    parentKey: 'Distributor',
+    childrenKey: 'DistributorCustomer'
+  },
+  component: DistributorCustomer
 }
 ]
