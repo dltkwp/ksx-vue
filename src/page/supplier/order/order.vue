@@ -363,7 +363,9 @@
                           <div class="form-group">
                             <label class="col-lg-2 control-label">下单时间</label>
                             <div class="col-lg-4">
-                              <input type="email" placeholder="2018/02/10～2018/02/28" class="form-control">
+                              <date-picker :value="datePicker" format="yyyy-MM-dd" 
+                                type="daterange" placement="bottom-end" @on-change="handleChange"
+                                placeholder="Select date" style="width: 200px"></date-picker>
                             </div>
                             <label class="col-lg-2 control-label">支付方式</label>
                             <div class="col-lg-4">
@@ -411,6 +413,7 @@ import vFoot from "@/components/foot/foot.vue";
 import vEmpty from "@/components/empty/empty.vue";
 
 import pagination from "@/components/pagination/pagination.vue";
+import { DatePicker } from 'iview';
 
 export default {
   components: {
@@ -418,7 +421,8 @@ export default {
     vTop,
     vFoot,
     vEmpty,
-    pagination
+    pagination,
+    DatePicker
   },
   data() {
     return {
@@ -427,9 +431,8 @@ export default {
       parentTotalPage: 0,
       parentCurrentpage: 1,
       curIndex: -1,
+      datePicker: ['', ''],
       rearch: {
-        st: "",
-        et: "",
         payType: "",
         status: "",
         content: "",
@@ -470,6 +473,7 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    handleChange(date){this.datePicker = date;},
     showPayModal:function(index){
       $("#").modal("show");
     },
@@ -764,6 +768,12 @@ export default {
       if (_this.rearch.distributor) {
         param.push("distributor=" + _this.rearch.distributor);
       }
+        let st = _this.datePicker[0];
+        let et = _this.datePicker[1];
+        if(st&&et){
+          param.push('st=' + st + ' 00:00:00');
+          param.push('et=' + et + ' 23:59:59');
+        }
 
       _this.PUSH_LOADING();
       _this.$axios

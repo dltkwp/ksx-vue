@@ -23,6 +23,8 @@
  import * as components from './components'
 
  import vLoading  from './components/loading/loading.vue'
+
+ import { DatePicker } from 'iview';
  
  export default {
   name: 'App',
@@ -32,7 +34,8 @@
     }
   },
   components: {
-    vLoading
+    vLoading,
+    DatePicker
   },
   computed: {
     ...mapGetters({

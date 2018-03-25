@@ -33,6 +33,9 @@
             var pattern = /^[a-zA-Z0-9]{8,20}$/;
             return pattern.test(v);
         }
+        function newDate(dt) {
+           return new Date(Date.parse(dt.replace(/-/g, "/")));
+        }
         var imgCdn = 'http://easy-time.oss-cn-beijing.aliyuncs.com/';
     </script>
 </head>

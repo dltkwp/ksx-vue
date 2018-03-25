@@ -12,11 +12,11 @@
                 <div class="form-group">
                     <input v-model="password" type="password" class="form-control" placeholder="密码">
                 </div>
-                <button @click="signin" type="button" class="btn btn-primary block full-width m-b">登录</button>
+                <input @click="signin" type="button" class="btn btn-primary block full-width m-b" value="登录">
 
                 <a href="javascript:;;"><small>忘记密码？</small></a>
-                <p class="text-muted text-center"><small>还没有账号？</small></p>
-                <a class="btn btn-sm btn-white btn-block" href="register.html">注册账号</a>
+                <p class="text-muted text-center" style="display:none;"><small>还没有账号？</small></p>
+                <a class="btn btn-sm btn-white btn-block"  style="display:none;" href="register.html">注册账号</a>
                 
             </form>
             <p class="m-t"> <small>注册成为分销商，月入过万</small> </p>
