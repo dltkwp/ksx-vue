@@ -11,7 +11,7 @@
                 <div class="ibox-content">
                   <div class="row m-b-sm ">
                   <div class="col-lg-6">
-                    <router-link class="btn btn-primary btn-sm" to="/v_supplier_goods_save">新增商品</router-link>
+                    <router-link class="btn btn-primary btn-sm" to="/v_distributor_goods_save">新增商品</router-link>
                   </div>
                   <div class="col-lg-6 text-right">
                           <div class="btn-group btn-group-sm">

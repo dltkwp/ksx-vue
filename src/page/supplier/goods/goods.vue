@@ -62,7 +62,7 @@
                           <td> {{item.stock}} </td>
                           <td><span class="label label-primary">在售</span></td>
                           <td>
-                              <router-link :to="{ name: 'DistributorGoodsDetail', params: { id: item.id }}" class="btn-white btn btn-sm">查看</router-link>
+                              <router-link :to="{ name: 'SupplierGoodsDetail', params: { id: item.id }}" class="btn-white btn btn-sm">查看</router-link>
                           </td>
                         </tr>
                       </tbody>

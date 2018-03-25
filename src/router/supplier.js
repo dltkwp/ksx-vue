@@ -50,7 +50,7 @@ export default [{
   name: 'Distributor',
   meta: {
     parentKey: 'Supplier',
-    childrenKey: 'Distributor'
+    childrenKey: 'SupplierDistributor'
   },
   component: Distributor
 }, {

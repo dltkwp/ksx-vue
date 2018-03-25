@@ -22,10 +22,10 @@
             <span class="nav-label">我是供应商</span> 
             <span class="fa arrow"></span>
           </a>
-          <ul class="nav nav-second-level collapse in" style="">
+          <ul class="nav nav-second-level" v-bind:class="{'collapse in':parentKey==='Supplier','collapse':parentKey!=='Supplier'}">
             <li v-bind:class="{active:childrenKey==='SupplierOrder'}"><router-link to="/v_supplier_order">订单管理</router-link></li>
-            <li v-bind:class="{active:childrenKey==='Distributor'}"><router-link to="/v_distributor">分销商管理</router-link></li>
-            <li v-bind:class="{active:childrenKey==='DistributorGoods'}"><router-link to="/v_supplier_goods">商品管理</router-link></li>
+            <li v-bind:class="{active:childrenKey==='SupplierDistributor'}"><router-link to="/v_distributor">分销商管理</router-link></li>
+            <li v-bind:class="{active:childrenKey==='SupplierGoods'}"><router-link to="/v_supplier_goods">商品管理</router-link></li>
             <li v-bind:class="{active:childrenKey==='DistributorLevel'}"><router-link to="/v_level">分销等级设置</router-link></li>
             <li v-bind:class="{active:childrenKey==='GoodsCategory'}"><router-link to="/v_category">商品分类设置</router-link></li>
           </ul>
@@ -35,7 +35,7 @@
           <i class="fa fa-sitemap"></i>
           <span class="nav-label">我是分销商</span> 
           <span class="fa arrow"></span></a>
-          <ul class="nav nav-second-level collapse" style="height: 0px;">
+          <ul class="nav nav-second-level"  v-bind:class="{'collapse in':parentKey==='Distributor','collapse':parentKey!=='Distributor'}">
             <li v-bind:class="{active:childrenKey==='DistributorOrder'}"><router-link to="/v_distributor_order">订单管理</router-link></li>     
             <li v-bind:class="{active:childrenKey==='DistributorCustomer'}"><router-link to="/v_distributor_customer">顾客管理</router-link></li>            
             <li v-bind:class="{active:childrenKey==='DistributorGoods'}"><router-link to="/v_distributor_goods">商品管理</router-link></li>
@@ -45,7 +45,7 @@
           <i class="fa fa-gears"></i> 
           <span class="nav-label">设置</span> 
           <span class="fa arrow"></span></a>
-          <ul class="nav nav-second-level collapse">
+          <ul class="nav nav-second-level" v-bind:class="{'collapse in':parentKey==='Setting','collapse':parentKey!=='Setting'}">
             <li v-bind:class="{active:childrenKey==='User'}"><router-link to="/v_user">个人信息</router-link></li>
           </ul>
         </li>
