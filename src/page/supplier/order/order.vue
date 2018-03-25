@@ -139,33 +139,32 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货人</label>
                           <div class="col-sm-10">
-                            <input type="text" value="张三" class="form-control" disabled="">
+                            <input type="text" v-bind:value="detai.recipients" class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货电话</label>
                           <div class="col-sm-10">
-                            <input type="text" value="15242612898" class="form-control" disabled="">
+                            <input type="text"  v-bind:value="detai.recipientsPhone"  class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货地址</label>
                           <div class="col-sm-10">
-                            <input type="text" value="高新园区招商兰溪谷" class="form-control" disabled="">
+                            <input type="text"  v-bind:value="detai.recipientsAddress"   class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">订单内容</label>
                           <div class="col-sm-10">
-                            <textarea class="form-control" disabled="">麦顿金典1袋</textarea>
+                            <textarea class="form-control" disabled=""   v-bind:value="detai.content"  ></textarea>
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">分销商</label>
                           <div class="col-sm-10">
                             <select class="form-control" disabled="">
-                              <option>分销商1</option>
-                            
+                              <!-- <option v-for="(item,index) in detail.orderSupplierList" :key="index"></option> -->
                             </select>
                           </div>
                         </div>
@@ -379,15 +378,8 @@
                           <div class="form-group">
                             <label class="col-lg-2 control-label">分销商</label>
                             <div class="col-sm-10">
-                              <label class="checkbox-inline">
-                                <input type="checkbox" value="option1" id="inlineCheckbox1">
-                                分销商1 </label>
-                              <label class="checkbox-inline">
-                                <input type="checkbox" value="option2" id="inlineCheckbox2">
-                                分销商2 </label>
-                              <label class="checkbox-inline">
-                                <input type="checkbox" value="option3" id="inlineCheckbox3">
-                                分销商3 </label>
+                              <label class="checkbox-inline" v-for="(item,index) in rearch.distributorList" :key='index'>
+                                <input v-bind:checked="item.id==rearch.distributorId" type="checkbox" value="option1" name="rearchDistributorList">{{item.realname}}</label>
                             </div>
                           </div>
                         </form>
@@ -444,7 +436,9 @@ export default {
         recipients: "",
         distributor: "",
         showStatusText:"",
-        isSupplier: 1
+        isSupplier: 1,
+        distributorList:[],
+        distributorId:''
       },
       send: {
         company: "",
@@ -800,8 +794,11 @@ export default {
         .then(result => {
           let res = result.data;
           _this.distributorList = res.list;
+          _this.rearch.distributorList = _.$lodash.deepClone(res.list);
+           
           if(res.list.length>0){
             _this.distributorId = res.list[0].id;
+            _this.rearch.distributorId =  res.list[0].id;
           }
         })
         .catch(err => {

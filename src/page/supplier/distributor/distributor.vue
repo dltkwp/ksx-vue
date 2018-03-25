@@ -201,7 +201,7 @@ export default {
         .post("user/dealer", {
           phone: mobile,
           realname: name,
-          username: name,
+          username: mobile,
           wechart: wechart,
           alipay: alipay,
           password: password,

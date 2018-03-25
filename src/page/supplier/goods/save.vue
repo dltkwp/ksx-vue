@@ -83,7 +83,7 @@
                                             <tr v-for="(item,index) in leveList" :key="index">
                                                 <td> {{item.levelName}} </td>
                                                 <td> {{item.discount}}% </td>
-                                                <td><input type="checkbox"  class="i-checks" v-bind:checked="item.allow"></td>
+                                                <td><input type="checkbox" v-model="item.allow"  class="i-checks" v-bind:checked="item.allow"></td>
                                                 <td><input v-model="item.price" type="text" class="form-control" placeholder=""></td>
                                             </tr>
                                         </tbody>
@@ -292,7 +292,8 @@ export default {
         }
         prices.push({
           productId: id,
-          price: item.price.trim()
+          price: item.price.trim(),
+          allow: item.allow
         });
       });
       if (errors.length > 0) {
@@ -331,14 +332,20 @@ export default {
         _this.$toast.success("请先保存基础信息");
         return false;
       }
-      let imgs = _this.$lodash.filter(_this.images,function(item){ return item.url!="";});
-      let arr = _this.$lodash.orderBy(imgs,"sort",'asc');
-      let imageCodes = _this.$lodash.map(arr,'code');
+      let imgs = _this.$lodash.filter(_this.images, function(item) {
+        return item.url != "";
+      });
+      let arr = _this.$lodash.orderBy(imgs, "sort", "asc");
+      let imageCodes = _this.$lodash.map(arr, "code");
+      if (imageCodes.length == 0) {
+        _this.$toast.warning("请先上传图片且至少上传一张图片");
+        return false;
+      }
       //提交
       _this.$axios
         .put("products", {
           id: id,
-          images: imageCodes.join(',')
+          images: imageCodes.join(",")
         })
         .then(result => {
           let res = result.data;
@@ -392,11 +399,11 @@ export default {
       _this.images[index].url = "";
     },
     inintImages: function() {
-      this.images.push({ url: "" , code:'', sort:1 });
-      this.images.push({ url: "" , code:'',  sort:2 });
-      this.images.push({ url: "" , code:'', sort:3 });
-      this.images.push({ url: "" , code:'', sort:4 });
-      this.images.push({ url: "" , code:'', sort:5 });
+      this.images.push({ url: "", code: "", sort: 1 });
+      this.images.push({ url: "", code: "", sort: 2 });
+      this.images.push({ url: "", code: "", sort: 3 });
+      this.images.push({ url: "", code: "", sort: 4 });
+      this.images.push({ url: "", code: "", sort: 5 });
     },
     uploadImage: function(index) {
       this.imageIndex = index;
@@ -426,7 +433,7 @@ export default {
 
           var imgSize = size / 1024 / 1024;
           if (imgSize > 3) {
-            _this.$toast.warning("图片大小超过3M,请上传小于3M的图片.")
+            _this.$toast.warning("图片大小超过3M,请上传小于3M的图片.");
             return false;
           }
           var formData = new FormData();
@@ -434,15 +441,15 @@ export default {
 
           let _this = this;
           _this.$axios
-            .post("upload", formData,{
-                headers:{'Content-Type':'multipart/form-data'}
+            .post("upload", formData, {
+              headers: { "Content-Type": "multipart/form-data" }
             })
             .then(result => {
               let res = result.data;
               _this.images[_this.imageIndex].url = imgCdn + res.fileCode;
               _this.images[_this.imageIndex].code = res.fileCode;
-              
-              _this.$toast.success('操作成功');
+
+              _this.$toast.success("操作成功");
             })
             .catch(err => {});
         }

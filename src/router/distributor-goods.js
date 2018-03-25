@@ -6,7 +6,7 @@ export default [{
   name: 'DistributorGoods',
   meta: {
     parentKey: 'Supplier',
-    childrenKey: 'DistributorGoods',
+    childrenKey: 'DistributorGoods'
   },
   component: DistributorGoods
 },
@@ -15,7 +15,7 @@ export default [{
   name: 'DistributorGoodsSave',
   meta: {
     parentKey: 'Supplier',
-    childrenKey: 'DistributorGoodsSave',
+    childrenKey: 'DistributorGoods'
   },
   component: DistributorGoodsSave
 }
