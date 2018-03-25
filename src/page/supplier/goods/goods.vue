@@ -6,37 +6,6 @@
         <div class="wrapper wrapper-content animated fadeInRight">
           <div class="row">
             <div class="col-lg-12">
-              <!-- <div class="ibox-content m-b-sm border-bottom">
-                 <div class="row">
-                  <div class="col-sm-4">
-                    <div class="form-group">
-                      <label class="control-label" for="product_name">名称</label>
-                      <input type="text" v-model="resarch.productName"  placeholder="名称" class="form-control" maxlength="20">
-                    </div>
-                  </div>
-                  <div class="col-sm-4">
-                    <div class="form-group">
-                      <label class="control-label" for="price">分类</label>
-                      <select v-model="resarch.categoriesId" class="form-control">
-                          <option v-for="(item,index) in categoryList" :key="index" v-bind:value="item.id">
-                            {{ item.categoriesName }}
-                          </option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-sm-4">
-                    <div class="form-group">
-                      <label class="control-label" for="status">状态</label>
-                      <select v-model="resarch.status" class="form-control">
-                        <option value="">全部</option>
-                        <option value="1">在售</option>
-                        <option value="0">停售</option>
-                      </select>
-                    </div>
-                  </div>
-                <button type="button" @click="rearchSubmit()" class="btn btn-primary">Rearch</button>                  
-                </div>
-              </div> -->
               <div class="ibox float-e-margins">
                 <div class="ibox-title"> 商品列表 </div>
                 <div class="ibox-content">
@@ -82,7 +51,7 @@
                       <tbody>
                         <tr v-for="(item,index) in list" :key="index">
                           <td> {{item.productNo}}</td>
-                          <td><img src="img/gallery/2s.jpg" class="img-lg"> {{item.productName}} </td>
+                          <td><img v-bind:src="img.realUrl" v-if="imgIndex==0" class="img-lg" v-for="(img,imgIndex) in item.images" :key="imgIndex"> {{item.productName}} </td>
                           <td> {{item.categoriesName}} </td>
                           <td> ￥{{item.minRetailPrice}} </td>
                           <td> ￥{{item.recommendedRetailPrice}} </td>
@@ -92,7 +61,9 @@
                           <td> ￥40.00 </td>
                           <td> {{item.stock}} </td>
                           <td><span class="label label-primary">在售</span></td>
-                          <td><button class="btn-white btn btn-sm">查看</button></td>
+                          <td>
+                              <router-link :to="{ name: 'DistributorGoodsDetail', params: { id: item.id }}" class="btn-white btn btn-sm">查看</router-link>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -220,8 +191,11 @@ export default {
           let res = result.data;
           _this.parentTotalPage = res.pages;
           _this.$lodash.forEach(res.list, function(item) {
-            let _category = _this.categoriesIdMap[item.categoriesId];
-            item.categoriesName = _category ? _category.categoriesName : "";
+              let _category = _this.categoriesIdMap[item.categoriesId];
+              item.categoriesName = _category ? _category.categoriesName : "";
+              _.forEach(item.images,function(img,imgIndex){
+                  img.realUrl = imgCdn + img.imageCode;
+              })
           });
           _this.list = res.list;
           _this.SHIFT_LOADING();

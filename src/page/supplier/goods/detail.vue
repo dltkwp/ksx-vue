@@ -159,6 +159,7 @@ export default {
   },
   data() {
     return {
+      goodsId: "",
       loading: false,
       categoryList: [],
       tabType: "base", //base: 基本信息,price: 分销价格设置 , images: 图片
@@ -180,13 +181,43 @@ export default {
     };
   },
   mounted() {
-    this.SHIFT_LOADING();
+    this.goodsId = this.$route.params.id;
+
     this.levelListData();
     this.categoryListData();
-    this.inintImages();
+
+    this.detail();
+    this.SHIFT_LOADING();
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    detail() {
+      let _this = this;
+      _this.$axios
+        .get("products/" + this.$route.params.id)
+        .then(result => {
+          let res = result.data;
+          res.status = res.status ? 1 : 0;
+          _this.save = res;
+          this.inintImages();
+
+            try{
+                _this.$lodash.forEach(_this.leveList, function(item) {
+                    let curLevel = _this.$lodash.find(res.prices, {
+                        distributorLevelId: item.id
+                    });
+                    item.price = curLevel.price || "";
+                    item.allow = curLevel.allow || false;
+                    item.id = curLevel.id;
+                    item.distributorLevelId = curLevel.distributorLevelId;
+                });
+            }catch(e){console.log(e);}
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    },
     tabChange(key) {
       this.tabType = key;
       switch (key) {
@@ -243,7 +274,8 @@ export default {
 
       _this.loading = true;
       _this.$axios
-        .post("products", {
+        .put("products", {
+            id:this.$route.params.id,
           status: status,
           categoriesId: categoriesId,
           productNo: productNo,
@@ -258,17 +290,6 @@ export default {
           let res = result.data;
           _this.$toast.success("操作成功");
           _this.save.id = res.productId;
-          // switch (res.code) {
-          //     case 200:
-          //     {
-          //         _this.$toast.success("操作成功");
-          //         _this.save.id = res.productId;
-          //     }
-          //     break;
-          //     default: {
-          //         _this.$toast.error(res.msg);
-          //     }
-          // }
           _this.loading = false;
           _this.SHIFT_LOADING();
         })
@@ -293,7 +314,7 @@ export default {
         prices.push({
           productId: id,
           price: item.price.trim(),
-          distributorLevelId:item.id,
+          distributorLevelId:item.distributorLevelId,
           allow: item.allow
         });
       });
@@ -303,7 +324,7 @@ export default {
 
       _this.$axios
         .put("products", {
-          id: id,
+          id: this.$route.params.id,
           prices: prices
         })
         .then(result => {
@@ -345,7 +366,7 @@ export default {
       //提交
       _this.$axios
         .put("products", {
-          id: id,
+          id: this.$route.params.id,
           images: imageCodes.join(",")
         })
         .then(result => {
@@ -400,11 +421,18 @@ export default {
       _this.images[index].url = "";
     },
     inintImages: function() {
-      this.images.push({ url: "", code: "", sort: 1 });
-      this.images.push({ url: "", code: "", sort: 2 });
-      this.images.push({ url: "", code: "", sort: 3 });
-      this.images.push({ url: "", code: "", sort: 4 });
-      this.images.push({ url: "", code: "", sort: 5 });
+      let _this = this;
+      _this.images.push({ url: "", code: "", sort: 1 });
+      _this.images.push({ url: "", code: "", sort: 2 });
+      _this.images.push({ url: "", code: "", sort: 3 });
+      _this.images.push({ url: "", code: "", sort: 4 });
+      _this.images.push({ url: "", code: "", sort: 5 });
+      let imgArr = _this.save.images.split(",");
+      _this.$lodash.forEach(imgArr, function(code, index) {
+        let cur = _this.images[index];
+        cur.url = imgCdn + code;
+        cur.code = code;
+      });
     },
     uploadImage: function(index) {
       this.imageIndex = index;
