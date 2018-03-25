@@ -38,7 +38,7 @@
           <ul class="nav nav-second-level collapse" style="height: 0px;">
             <li v-bind:class="{active:childrenKey==='DistributorOrder'}"><router-link to="/v_distributor_order">订单管理</router-link></li>     
             <li v-bind:class="{active:childrenKey==='DistributorCustomer'}"><router-link to="/v_distributor_customer">顾客管理</router-link></li>            
-            <li><a href="product-distributor.html">商品管理</a></li>
+            <li v-bind:class="{active:childrenKey==='DistributorGoods'}"><router-link to="/v_distributor_goods">商品管理</router-link></li>
           </ul>
         </li>
         <li v-bind:class="{active:parentKey==='Setting'}"> <a href="javascript:;;">

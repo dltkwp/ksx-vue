@@ -2,14 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/page/login/login'
 import Index from '@/page/index/index'
-
 import User from './user'
-import GoodsCategory from './goods-category'
-import DistributorLevel from './distributor-level'
-import Goods from './distributor-goods'
-import Order from './order'
-import Distributor from './supplier-distributor'
-import DistributorCustomer from './distributor-customer.js'
+
+// 分销商的路由设置
+import Distributor from './distributor.js'
+// 供应商 路由管理
+import Supplier from './supplier'
 
 Vue.use(Router)
 
@@ -29,10 +27,7 @@ let router = new Router({
       childrenKey: 'Index'
     }
   }
-  ].concat(User).concat(GoodsCategory)
-    .concat(DistributorLevel).concat(Goods)
-    .concat(Order).concat(Distributor)
-    .concat(DistributorCustomer)
+  ].concat(User).concat(Supplier).concat(Distributor)
 })
 
 router.beforeEach((to, from, next) => {

@@ -271,13 +271,14 @@ export default {
         _this.$toast.warning("库存格式不正确");
         return false;
       }
+
       _this.loading = true;
       _this.$axios
         .put("products", {
-          id:this.$route.params.id,
-          descriptionId:_this.save.descriptionId,
+            id:this.$route.params.id,
           status: status,
           categoriesId: categoriesId,
+          descriptionId:_this.save.descriptionId,
           productNo: productNo,
           productName: productName,
           cost: cost,
