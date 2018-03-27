@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/page/login/login'
-import Index from '@/page/index/index'
 import User from './user'
 
 // 分销商的路由设置
@@ -17,15 +16,6 @@ let router = new Router({
     path: '/v_login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/v_index',
-    name: 'Index',
-    component: Index,
-    meta: {
-      parentKey: 'Index',
-      childrenKey: 'Index'
-    }
   }
   ].concat(User).concat(Supplier).concat(Distributor)
 })
