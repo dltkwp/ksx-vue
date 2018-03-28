@@ -39,12 +39,12 @@
                         <tbody>
                             <tr v-for="(item,index) in list" :key="index">
                                 <td>{{index + 1}}</td>
-                                <td>王杰</td>
-                                <td>15242612898</td>
-                                <td>辽宁省大连市高新园区创业E港</td>
+                                <td>{{item.username}}</td>
+                                <td>{{item.username}}</td>
+                                <td>{{''}}</td>
                                 <td></td>
-                                <td>20</td>
-                                <td>￥3200</td>
+                                <td>{{item.sumOrder || 0}}</td>
+                                <td>￥{{(item.sumPay || 0).toFixed(2)}}</td>
                                 <td><div class="btn btn-sm btn-default" data-toggle="modal" href="#modal-send">历史订单</div></td>
                             </tr>
                         </tbody>
@@ -163,11 +163,11 @@ export default {
       _this.PUSH_LOADING();
       _this.loading = true;
       _this.$axios
-        .post("user/dealer", {
-          phone: mobile,
-          mobile: mobile,
-          addr: addr,
-          remark:remark
+        .post("user/normal", {
+          realname:name,
+          recipientsPhone: mobile,
+          recipientsAddress: addr,
+          comment:remark
         })
         .then(result => {
           let res = result.data;
@@ -183,8 +183,8 @@ export default {
               }
               break;
             default: {
-              _this.loading = false;
-              _this.$toast.error(res.msg);
+                _this.loading = false;
+                _this.$toast.error(res.msg);
             }
           }
         })
@@ -220,7 +220,7 @@ export default {
       }
       _this.PUSH_LOADING();
       _this.$axios
-        .get("user/dealer?" + param.join("&"))
+        .get("user/normal?" + param.join("&"))
         .then(result => {
           let res = result.data;
           _this.parentTotalPage = res.pages;
