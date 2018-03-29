@@ -39,10 +39,10 @@
                         <tbody>
                             <tr v-for="(item,index) in list" :key="index">
                                 <td>{{index + 1}}</td>
-                                <td>{{item.username}}</td>
-                                <td>{{item.username}}</td>
-                                <td>{{''}}</td>
-                                <td></td>
+                                <td>{{item.realname}}</td>
+                                <td>{{item.recipientsPhone}}</td>
+                                <td>{{item.recipientsAddress}}</td>
+                                <td>{{item.comment}}</td>
                                 <td>{{item.sumOrder || 0}}</td>
                                 <td>￥{{(item.sumPay || 0).toFixed(2)}}</td>
                                 <td><div class="btn btn-sm btn-default" data-toggle="modal" href="#modal-send">历史订单</div></td>
