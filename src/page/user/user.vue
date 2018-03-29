@@ -89,7 +89,6 @@
           </div>
         </div>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 

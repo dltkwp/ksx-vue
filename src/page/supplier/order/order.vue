@@ -68,12 +68,13 @@
                             <span class="label label-danger" v-if="item.payType=='check'">付款待审核</span>
                           </td>
                           <td>
-                            <span class="label label-warning" v-if="item.status=='WAIT'">等待发货</span>
-                            <span class="label label-primary" v-if="item.status=='DELIVERY'">已发货</span>
+                             <span class="label label-warning" v-if="item.status=='WAIT'">等待发货</span>
+                             <span class="label label-primary" v-if="item.status=='DELIVERY'">已发货</span>
+                             <span v-if="item.status=='DELIVERY'">已签收</span>
                           </td>
                           <td>
-                            <div class="btn btn-sm btn-primary" @click="showPayModal(index)">收款</div>
-						                <div class="btn btn-sm btn-default" @click="showChangePriceodal(index)">改价</div>
+                            <div class="btn btn-sm btn-primary" @click="showPayModal(index)" v-if="item.payType=='none'">收款</div>
+						                <div class="btn btn-sm btn-default" @click="showChangePriceodal(index)"  v-if="item.status=='WAIT'">改价</div>
                             <div class="btn btn-sm btn-default" @click="showDetailModal(index)">详情</div>
                             <div class="btn btn-sm btn-primary" @click="showSendModal(index)" v-if="item.status=='WAIT'">发货</div>
                             <div class="btn btn-sm btn-default" @click="showViewModal(index)" v-if="item.status=='DELIVERY'">物流</div>
@@ -399,7 +400,6 @@
         </div>
       </div>
     </div>
-    <v-foot></v-foot>
   </div>
 </template>
 

@@ -82,7 +82,7 @@
                                         <tbody>
                                             <tr v-for="(item,index) in leveList" :key="index">
                                                 <td> {{item.levelName}} </td>
-                                                <td> {{item.discount}}% </td>
+                                                <td> {{item.discount}}折 </td>
                                                 <td><input type="checkbox" v-model="item.allow"  class="i-checks" v-bind:checked="item.allow"></td>
                                                 <td><input v-model="item.price" type="text" class="form-control" placeholder=""></td>
                                             </tr>
@@ -139,7 +139,6 @@
         <input type="file" name="uploadFile" id="uploadFile" multiple="multiple" style="display:none;" @change="imgUploadFileChange($event)">
       </form>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 
@@ -408,7 +407,6 @@ export default {
         .then(result => {
           let list = result.data;
           _this.$lodash.forEach(list, function(item) {
-            item.discount = 100;
             item.allow = false;
             item.price = "";
           });
@@ -427,12 +425,14 @@ export default {
       _this.images.push({ url: "", code: "", sort: 3 });
       _this.images.push({ url: "", code: "", sort: 4 });
       _this.images.push({ url: "", code: "", sort: 5 });
-      let imgArr = _this.save.images.split(",");
-      _this.$lodash.forEach(imgArr, function(code, index) {
-        let cur = _this.images[index];
-        cur.url = imgCdn + code;
-        cur.code = code;
-      });
+      if(this.save.images.indexOf(',')>=0){
+        let imgArr = _this.save.images.split(",");
+        _this.$lodash.forEach(imgArr, function(code, index) {
+          let cur = _this.images[index];
+          cur.url = imgCdn + code;
+          cur.code = code;
+        });
+      }
     },
     uploadImage: function(index) {
       this.imageIndex = index;

@@ -38,6 +38,7 @@
                         </tr>
                       </tbody>
                     </table>
+                     <v-empty :isShow="list.length==0"></v-empty>
                   </div>
                 </div>
               </div>
@@ -49,7 +50,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">新增分类</h4>
+                <h4 class="modal-title">新增</h4>
               </div>
               <div class="modal-body">
                   <div class="row">
@@ -85,7 +86,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">编辑分类</h4>
+                <h4 class="modal-title">编辑</h4>
               </div>
               <div class="modal-body">
                 <div class="row">
@@ -142,7 +143,6 @@
           </div>
         </div>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 
@@ -153,12 +153,15 @@
   import vMenus from "@/components/menus/menus.vue";
   import vTop from "@/components/top/top.vue";
   import vFoot from "@/components/foot/foot.vue";
+  import vEmpty from "@/components/empty/empty.vue";
+  
 
   export default {
     components: {
       vMenus,
       vTop,
-      vFoot
+      vFoot,
+      vEmpty
     },
     data() {
       return {

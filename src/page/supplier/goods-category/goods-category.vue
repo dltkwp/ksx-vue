@@ -36,6 +36,7 @@
                         </tr>
                       </tbody>
                     </table>
+                     <v-empty :isShow="list.length==0"></v-empty>
                   </div>
                 </div>
               </div>
@@ -120,7 +121,6 @@
           </div>
         </div>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 
@@ -131,12 +131,15 @@ import * as types from "@/store/mutation-types.js";
 import vMenus from "@/components/menus/menus.vue";
 import vTop from "@/components/top/top.vue";
 import vFoot from "@/components/foot/foot.vue";
+import vEmpty from "@/components/empty/empty.vue";
+
 
 export default {
   components: {
     vMenus,
     vTop,
-    vFoot
+    vFoot,
+    vEmpty
   },
   data() {
     return {

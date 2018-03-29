@@ -89,7 +89,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-white">关闭</button>
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 <button type="button" @click="saveSubmit()"  class="btn btn-primary">保存</button>
             </div>
             </div>

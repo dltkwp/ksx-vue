@@ -82,7 +82,7 @@
                                         <tbody>
                                             <tr v-for="(item,index) in leveList" :key="index">
                                                 <td> {{item.levelName}} </td>
-                                                <td> {{item.discount}}% </td>
+                                                <td> {{item.discount}} 折 </td>
                                                 <td><input type="checkbox" v-model="item.allow"  class="i-checks" v-bind:checked="item.allow"></td>
                                                 <td><input v-model="item.price" type="text" class="form-control" placeholder=""></td>
                                             </tr>
@@ -139,7 +139,6 @@
         <input type="file" name="uploadFile" id="uploadFile" multiple="multiple" style="display:none;" @change="imgUploadFileChange($event)">
       </form>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 
@@ -215,13 +214,16 @@ export default {
       let minRetailPrice = _this.save.minRetailPrice;
       let stock = _this.save.stock;
       let description = _this.save.description;
-
       if (!productNo) {
         _this.$toast.warning("编号不可为空");
         return false;
       }
       if (!productName) {
         _this.$toast.warning("产品名称不可为空");
+        return false;
+      }
+      if (!categoriesId) {
+        _this.$toast.warning("请选择分类");
         return false;
       }
       if (!priceValidate(cost)) {
@@ -244,7 +246,7 @@ export default {
       _this.loading = true;
       _this.$axios
         .post("products", {
-          status: status,
+          status: (status == 1),
           categoriesId: categoriesId,
           productNo: productNo,
           productName: productName,
@@ -258,17 +260,6 @@ export default {
           let res = result.data;
           _this.$toast.success("操作成功");
           _this.save.id = res.productId;
-          // switch (res.code) {
-          //     case 200:
-          //     {
-          //         _this.$toast.success("操作成功");
-          //         _this.save.id = res.productId;
-          //     }
-          //     break;
-          //     default: {
-          //         _this.$toast.error(res.msg);
-          //     }
-          // }
           _this.loading = false;
           _this.SHIFT_LOADING();
         })
@@ -387,9 +378,8 @@ export default {
         .then(result => {
           let list = result.data;
           _this.$lodash.forEach(list, function(item) {
-            item.discount = 100;
             item.allow = false;
-            item.price = "";
+            item.price = '';
           });
           _this.leveList = list;
         })

@@ -17,7 +17,7 @@
                           <div class="btn-group btn-group-sm">
                           <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false">{{resarch.curCategory.categoriesName}} <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                              <li @click="categroyChange(index)" v-for="(item,index) in categoryList" :key="index" ><a href="javascript:;;">{{ item.categoriesName }}</a></li>
+                              <li @click="categoryChange(index)" v-for="(item,index) in categoryList" :key="index" ><a href="javascript:;;">{{ item.categoriesName }}</a></li>
                             </ul>
                           </div>
                           <div class="search-box">
@@ -40,9 +40,7 @@
                           <th>进货价 </th>
                           <th>建议售价 </th>
                           <th>最低售价 </th>
-                          <th>一级分销价 </th>
-                          <th>二级分销价 </th>
-                          <th>三级分销价 </th>
+                          <th v-for="(item,index) in levelArr" :key="index">{{item.distributorLevelName || ''}}</th>
                           <th>库存 </th>
                           <th>状态 </th>
                           <th>操作</th>
@@ -56,11 +54,12 @@
                           <td> ￥{{item.minRetailPrice}} </td>
                           <td> ￥{{item.recommendedRetailPrice}} </td>
                           <td> ￥{{item.minRetailPrice}} </td>
-                          <td> ￥30.00 </td>
-                          <td> ￥35.00 </td>
-                          <td> ￥40.00 </td>
+                          <td v-for="(price,index) in item.prices" :key="index"> ￥{{price.price}} </td>
                           <td> {{item.stock}} </td>
-                          <td><span class="label label-primary">在售</span></td>
+                          <td>
+                            <span class="label label-primary" v-if="item.status">在售</span>
+                            <span class="label label-danger"  v-if="!item.status">停售</span>
+                          </td>
                           <td>
                               <router-link :to="{ name: 'SupplierGoodsDetail', params: { id: item.id }}" class="btn-white btn btn-sm">查看</router-link>
                           </td>
@@ -108,7 +107,6 @@
           </div>
         </div>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 <script>
@@ -140,7 +138,7 @@ export default {
         status: "",
         productName: ""
       },
-      categoriesIdMap: [],
+      levelArr: [],
       categoryList: [],
       parentTotalPage: 0,
       parentCurrentpage: 1
@@ -190,13 +188,25 @@ export default {
         .then(result => {
           let res = result.data;
           _this.parentTotalPage = res.pages;
-          _this.$lodash.forEach(res.list, function(item) {
-              let _category = _this.categoriesIdMap[item.categoriesId];
-              item.categoriesName = _category ? _category.categoriesName : "";
-              _.forEach(item.images,function(img,imgIndex){
-                  img.realUrl = imgCdn + img.imageCode;
-              })
-          });
+
+          try{
+                _this.$lodash.forEach(res.list, function(item) {
+              
+                  _this.$lodash.forEach(item.images,function(img,imgIndex){
+                      img.realUrl = imgCdn + img.imageCode;
+                  })
+
+                  let curCategory = _this.$lodash.find(_this.categoryList,{id:item.categoriesId});
+                  if(curCategory){
+                      item.categoriesName = curCategory.categoriesName;
+                  }
+                  if(_this.levelArr.length==0){
+                      _this.levelArr = _this.$lodash.cloneDeep(item.prices);
+                  }
+              });
+          }catch(e){
+            console.error(e);
+          }
           _this.list = res.list;
           _this.SHIFT_LOADING();
         })
@@ -204,10 +214,10 @@ export default {
           _this.SHIFT_LOADING();
         });
     },
-    categroyChange:function(index){
+    categoryChange:function(index){
       let cur = this.categoryList[index];
       this.resarch.curCategory = cur;
-       this.parentCurrentpage = 1;
+      this.parentCurrentpage = 1;
       this.listData();
     },
     categoryListData() {
@@ -218,12 +228,9 @@ export default {
           let tempArr = [];
           tempArr.push({ categoriesName: "全部", id: "" });
           tempArr = tempArr.concat(result.data);
-          _this.$lodash.forEach(result.data, function(item) {
-            _this.categoriesIdMap[item.id] = item;
-          });
-
           _this.categoryList = tempArr;
           this.resarch.curCategory = tempArr[0];
+          
         })
         .catch(err => {});
     }

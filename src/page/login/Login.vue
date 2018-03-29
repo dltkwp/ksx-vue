@@ -7,16 +7,15 @@
             <h3>欢迎使用速销平台</h3>
             <form class="m-t" role="form">
                 <div class="form-group">
-                    <input v-model="userName" type="text" class="form-control" placeholder="账号">
+                    <input v-model="userName" type="text" class="form-control" placeholder="账号" maxlength="11">
                 </div>
                 <div class="form-group">
                     <input v-model="password" type="password" class="form-control" placeholder="密码">
                 </div>
                 <input @click="signin" type="button" class="btn btn-primary block full-width m-b" value="登录">
-
-                <a href="javascript:;;"><small>忘记密码？</small></a>
-                <p class="text-muted text-center" style="display:none;"><small>还没有账号？</small></p>
-                <a class="btn btn-sm btn-white btn-block"  style="display:none;" href="register.html">注册账号</a>
+                <!-- <a href="javascript:;;"><small>忘记密码？</small></a> -->
+                <!-- <p class="text-muted text-center" style="display:none;"><small>还没有账号？</small></p>
+                <a class="btn btn-sm btn-white btn-block"  style="display:none;" href="register.html">注册账号</a> -->
                 
             </form>
             <p class="m-t"> <small>注册成为分销商，月入过万</small> </p>
@@ -46,6 +45,10 @@
             var password = _this.password.trim();
             if(_this.$lodash.isEmpty(userName)){
                 _this.$toast.warning('登陆名称不可为空.');
+                return false;
+            }
+            if (!mobileValidate(userName)) {
+                _this.$toast.warning("手机号格式不正确");
                 return false;
             }
             if(_this.$lodash.isEmpty(password)){
