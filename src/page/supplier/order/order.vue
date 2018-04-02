@@ -103,22 +103,22 @@
                       <form role="form">
                         <div class="form-group">
                           <label>订单原价</label>
-                          <input type="text" value="500.00" class="form-control" disabled="">
+                          <input type="text" v-bind:value="changePrice.oldPayment" class="form-control" disabled="">
                         </div>
                         <div class="form-group">
                           <label>修改价格为</label>
-                          <input type="text" placeholder="请输入价格" class="form-control">
+                          <input type="text" placeholder="请输入价格" class="form-control" maxlength="9" v-model="changePrice.payment">
                         </div>
                         <div class="form-group">
                           <label>备注</label>
-                          <textarea class="form-control"></textarea>
+                          <textarea class="form-control" maxlength="500" v-model="changePrice.comment"></textarea>
                         </div>
                       </form>
                     </div>
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-primary">保存</button>
+                  <button type="button" class="btn btn-primary" @click="changePriceSave()" v-bind:readonly="loading" v-bind:disabled="loading" >保存</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
@@ -281,7 +281,7 @@
             </div>
           </div>
           <!-- 手动新增加订单 -->
-           <div id="order-add" class="modal fade" aria-hidden="true" style="display: none;">
+          <div id="order-add" class="modal fade" aria-hidden="true" style="display: none;">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -413,7 +413,7 @@ import vFoot from "@/components/foot/foot.vue";
 import vEmpty from "@/components/empty/empty.vue";
 
 import pagination from "@/components/pagination/pagination.vue";
-import { DatePicker } from 'iview';
+import { DatePicker } from "iview";
 
 export default {
   components: {
@@ -431,17 +431,17 @@ export default {
       parentTotalPage: 0,
       parentCurrentpage: 1,
       curIndex: -1,
-      datePicker: ['', ''],
+      datePicker: ["", ""],
       rearch: {
         payType: "",
         status: "",
         content: "",
         recipients: "",
         distributor: "",
-        showStatusText:"",
+        showStatusText: "",
         isSupplier: 1,
-        distributorList:[],
-        distributorId:''
+        distributorList: [],
+        distributorId: ""
       },
       send: {
         company: "",
@@ -461,9 +461,15 @@ export default {
         account: "",
         payment: ""
       },
-      detai:{},
-      distributorList:[], //新增订单时分销商的列表
-      distributorId:'', //新增订单时所选择的
+      detai: {},
+      changePrice: {
+        orderId: 0,
+        oldPayment: "",
+        payment: 0,
+        comment: ""
+      },
+      distributorList: [], //新增订单时分销商的列表
+      distributorId: "" //新增订单时所选择的
     };
   },
   mounted() {
@@ -473,89 +479,153 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-    handleChange(date){this.datePicker = date;},
-    showPayModal:function(index){
+    handleChange(date) {
+      this.datePicker = date;
+    },
+    showPayModal: function(index) {
       $("#").modal("show");
     },
-    showChangePriceodal:function(index){
+    showChangePriceodal: function(index) {
+      let _this = this;
+      let cur = _this.list[index];
+      _this.changePrice.orderId = cur.id;
+      _this.changePrice.oldPayment = cur.payment;
+      _this.changePrice.payment = 0;
+      _this.changePrice.comment = "";
       $("#edit-price").modal("show");
     },
-    showDetailModal:function(index){
+    changePriceSave: function() {
+      let _this = this;
+      let payment = _this.changePrice.payment.trim();
+      if (!priceValidate(payment)) {
+        _this.$toast.warning("金额格式不正确");
+        return false;
+      }
+      _this.loading = true;
+      _this.$axios
+        .post("orders/pay",_this.changePrice)
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                 $("#edit-price").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    showDetailModal: function(index) {
       $("#order-detail").modal("show");
       this.getDetail(this.list[index].id);
     },
-    advRearchSubmit:function(){
+    advRearchSubmit: function() {
       this.parentCurrentpage = 1;
       this.listData();
       $("#search-more").modal("hide");
     },
-    showAdvRearch:function(){
+    showAdvRearch: function() {
       //清理下界面元素 并弹出对话框
       $("#search-more").modal("show");
     },
-    orderStatusChange:function(key){
-        this.rearch.status = key;
-        switch (key) {
-         case "":{this.rearch.showStatusText = '全部订单';} break;
-         case "WAIT":{this.rearch.showStatusText = '等待发货';} break;
-         case "DELIVERY":{this.rearch.showStatusText = '已发货';} break;
-         case "RECEIVED":{this.rearch.showStatusText = '已签收';} break;
-         
-       }
-        this.parentCurrentpage = 1;
-        this.listData();
+    orderStatusChange: function(key) {
+      this.rearch.status = key;
+      switch (key) {
+        case "":
+          {
+            this.rearch.showStatusText = "全部订单";
+          }
+          break;
+        case "WAIT":
+          {
+            this.rearch.showStatusText = "等待发货";
+          }
+          break;
+        case "DELIVERY":
+          {
+            this.rearch.showStatusText = "已发货";
+          }
+          break;
+        case "RECEIVED":
+          {
+            this.rearch.showStatusText = "已签收";
+          }
+          break;
+      }
+      this.parentCurrentpage = 1;
+      this.listData();
     },
-    payTypeChange:function(key){
-       this.order.payType = key;
-       switch (key) {
-         case "none":{} break;
-         case "alipay":{} break;
-         case "wechart":{} break;
-       }
+    payTypeChange: function(key) {
+      this.order.payType = key;
+      switch (key) {
+        case "none":
+          {
+          }
+          break;
+        case "alipay":
+          {
+          }
+          break;
+        case "wechart":
+          {
+          }
+          break;
+      }
     },
-    orderSave:function(){
+    orderSave: function() {
       let _this = this;
-      let   recipients = _this.order.recipients.trim();
-      let   recipientsPhone  = _this.order.recipientsPhone.trim();
-      let   recipientsAddress = _this.order.recipientsAddress.trim();
-      let   content = _this.order.content.trim();
-      let   payType = _this.order.payType;
-      let   account = _this.order.account.trim();
-      let   payment = _this.order.payment.trim();
-      
+      let recipients = _this.order.recipients.trim();
+      let recipientsPhone = _this.order.recipientsPhone.trim();
+      let recipientsAddress = _this.order.recipientsAddress.trim();
+      let content = _this.order.content.trim();
+      let payType = _this.order.payType;
+      let account = _this.order.account.trim();
+      let payment = _this.order.payment.trim();
 
       if (recipients === "") {
-          _this.$toast.warning("收货人不可为空");
-          return false;
+        _this.$toast.warning("收货人不可为空");
+        return false;
       }
       if (!mobileValidate(recipientsPhone)) {
-          _this.$toast.warning("收货电话格式不正确");
-          return false;
+        _this.$toast.warning("收货电话格式不正确");
+        return false;
       }
       if (recipientsAddress === "") {
-          _this.$toast.warning("收货地址不可为空");
-          return false;
+        _this.$toast.warning("收货地址不可为空");
+        return false;
       }
-      if (payType!='none') {
-          if (account === "") {
-              _this.$toast.warning("账号不可为空");
-              return false;
-          }
-          if (!priceValidate(payment)) {
-              _this.$toast.warning("支付金额格式不正确");
-              return false;
-          }
+      if (payType != "none") {
+        if (account === "") {
+          _this.$toast.warning("账号不可为空");
+          return false;
+        }
+        if (!priceValidate(payment)) {
+          _this.$toast.warning("支付金额格式不正确");
+          return false;
+        }
       }
 
       _this.$axios
-        .post("orders",{
+        .post("orders", {
           recipients: recipients,
           recipientsPhone: recipientsPhone,
           recipientsAddress: recipientsAddress,
           content: content,
           payType: payType,
           account: account,
-          payment: payment
+          payment: payment,
+          isAgent: false
         })
         .then(result => {
           let res = result.data;
@@ -585,7 +655,7 @@ export default {
       this.listData();
     },
     showOrderSave: function() {
-      this.order= {
+      this.order = {
         recipients: "",
         recipientsPhone: "",
         recipientsAddress: "",
@@ -726,21 +796,13 @@ export default {
       this.parentCurrentpage = cPage;
       this.listData();
     },
-    getDetail:function(orderId){
+    getDetail: function(orderId) {
       let _this = this;
       _this.PUSH_LOADING();
       _this.$axios
         .get("orders/" + orderId)
         .then(result => {
-          let res = result.data;
-          _this.parentTotalPage = res.pages;
-          let tempList = res.list;
-          _this.$lodash.forEach(tempList, function(item) {
-            item.timeStr = _this
-              .$moment(item.createDate)
-              .format("YYYY/MM/DD HH:mm");
-          });
-          _this.list = tempList;
+          _this.detai = result.data;
           _this.SHIFT_LOADING();
         })
         .catch(err => {
@@ -768,12 +830,12 @@ export default {
       if (_this.rearch.distributor) {
         param.push("distributor=" + _this.rearch.distributor);
       }
-        let st = _this.datePicker[0];
-        let et = _this.datePicker[1];
-        if(st&&et){
-          param.push('st=' + st + ' 00:00:00');
-          param.push('et=' + et + ' 23:59:59');
-        }
+      let st = _this.datePicker[0];
+      let et = _this.datePicker[1];
+      if (st && et) {
+        param.push("st=" + st + " 00:00:00");
+        param.push("et=" + et + " 23:59:59");
+      }
 
       _this.PUSH_LOADING();
       _this.$axios
@@ -794,9 +856,9 @@ export default {
           _this.SHIFT_LOADING();
         });
     },
-    getDistributorList:function(){
-      let _this  = this;
-       let param = [];
+    getDistributorList: function() {
+      let _this = this;
+      let param = [];
       param.push("pageNum=1");
       param.push("pageSize=1000");
       _this.$axios
@@ -805,14 +867,13 @@ export default {
           let res = result.data;
           _this.distributorList = res.list;
           _this.rearch.distributorList = _.$lodash.deepClone(res.list);
-           
-          if(res.list.length>0){
+
+          if (res.list.length > 0) {
             _this.distributorId = res.list[0].id;
-            _this.rearch.distributorId =  res.list[0].id;
+            _this.rearch.distributorId = res.list[0].id;
           }
         })
-        .catch(err => {
-        });
+        .catch(err => {});
     }
   }
 };
