@@ -53,7 +53,7 @@
                       <td>{{item.username}}</td>
                       <td>{{item.phone}}</td>
                       <td>{{item.alipay}}</td>
-                      <td>{{item.wechart}}</td>
+                      <td>{{item.wechat}}</td>
                       <td>{{item.sumOrder||0}}</td>
                       <td>￥{{item.sumPay||0}}</td>
                       <td><div class="btn btn-sm btn-default" data-toggle="modal" href="#modal-send">历史订单</div></td>
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>微信</label>
-                                    <input  v-model="save.wechart" type="text"  maxlength="20"  placeholder="输入微信号后方便转账时进行查询（非必填）" class="form-control">
+                                    <input  v-model="save.wechat" type="text"  maxlength="20"  placeholder="输入微信号后方便转账时进行查询（非必填）" class="form-control">
                                 </div>
                                 </form>
                             </div>
@@ -160,7 +160,7 @@ export default {
         name: "",
         mobile: "",
         password: "12345678",
-        wechart: "",
+        wechat: "",
         alipay: ""
       }
     };
@@ -178,7 +178,7 @@ export default {
       let name = _this.save.name.trim();
       let mobile = _this.save.mobile.trim();
       let password = _this.save.password.trim();
-      let wechart = _this.save.wechart.trim();
+      let wechat = _this.save.wechat.trim();
       let alipay = _this.save.alipay.trim(); ///user/dealer
 
       if (name == "") {
@@ -201,7 +201,7 @@ export default {
           phone: mobile,
           realname: name,
           username: mobile,
-          wechart: wechart,
+          wechat: wechat,
           alipay: alipay,
           password: password,
           levelId: _this.save.levelId
@@ -239,7 +239,7 @@ export default {
       _this.save.name = "";
       _this.save.mobile = "";
       _this.save.password = "";
-      _this.save.wechart = "";
+      _this.save.wechat = "";
       _this.save.alipay = "";
       if(_this.save.levelList.length>0){
         _this.save.levelId = _this.save.levelList[0].id;

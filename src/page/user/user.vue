@@ -32,7 +32,7 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">微信</label>
                           <div class="col-sm-10">
-                            <input v-model="baseInfo.wechart" type="text" class="form-control" placeholder="输入微信后方便供应商与分销商之间转账（非必填）"  maxlength="20">
+                            <input v-model="baseInfo.wechat" type="text" class="form-control" placeholder="输入微信后方便供应商与分销商之间转账（非必填）"  maxlength="20">
                           </div>
                         </div>
                         <div class="hr-line-dashed"></div>
@@ -112,7 +112,7 @@ export default {
       baseInfo: {
         realname: "",
         phone: "",
-        wechart: "",
+        wechat: "",
         alipay: ""
       },
       password: {
@@ -129,7 +129,7 @@ export default {
       let u = JSON.parse(userInfo);
       _this.baseInfo.realname = u.realname;
       _this.baseInfo.phone = u.phone;
-      _this.baseInfo.wechart = u.wechart;
+      _this.baseInfo.wechat = u.wechat;
       _this.baseInfo.alipay = u.alipay;
     }
   },
@@ -155,7 +155,7 @@ export default {
       let _this = this;
       let realname = _this.baseInfo.realname.trim();
       let phone = _this.baseInfo.phone.trim();
-      let wechart = _this.baseInfo.wechart.trim();
+      let wechat = _this.baseInfo.wechat.trim();
       let alipay = _this.baseInfo.alipay.trim();
       if (_this.$lodash.isEmpty(realname)) {
         _this.$toast.warning("姓名不可为空");
@@ -175,7 +175,7 @@ export default {
           'alipay': alipay,
           'phone': phone,
           'realname': realname,
-          'wechart': wechart
+          'wechat': wechat
         })
         .then(result => {
           let res = result.data;
@@ -188,7 +188,7 @@ export default {
                   let u = JSON.parse(userInfo);
                   u.realname = realname;
                   u.phone = phone;
-                  u.wechart = wechart;
+                  u.wechat = wechat;
                   u.alipay = alipay;
                   localStorage.setItem("ksx-user-c",JSON.stringify(u))
                 }

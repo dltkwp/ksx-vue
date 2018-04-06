@@ -11,7 +11,7 @@
               <div class="ibox-content">
                 <div class="row m-b-sm ">
                   <div class="col-lg-6">
-                      <button class="btn btn-primary btn-sm" data-toggle="modal" href="#order-add">新增订单</button>
+                      <button class="btn btn-primary btn-sm" @click="shwoSaveModal()">新增订单</button>
                   </div>
                   <div class="col-lg-6 text-right">
                     <div class="btn-group btn-group-sm">
@@ -58,10 +58,10 @@
                           <td>{{item.recipientsPhone}}</td>
                           <td>{{item.recipientsAddress}}</td>
                           <td>
-                            <a href="#">王刚 13478659803</a>
+                            <a href="javascript:;;" v-for="(supplier,index) in item.orderSupplierList" :key="index">{{supplier.realname}} {{supplier.phone||''}}</a>
                           </td>
-                          <td v-show="item.payType=='none'">-</td>
-                          <td v-show="item.payType!='none'"> ￥{{item.payment}}</td>                          
+                          <td v-if="item.payment==null">-</td>
+                          <td v-if="item.payment!==null">￥{{item.payment}}</td>
                           <td>
                             {{item.payType=='none'?'':item.payType}}
                             <span class="label label-danger" v-if="item.payType=='none'">暂未付款</span>
@@ -70,13 +70,14 @@
                           <td>
                              <span class="label label-warning" v-if="item.status=='WAIT'">等待发货</span>
                              <span class="label label-primary" v-if="item.status=='DELIVERY'">已发货</span>
-                             <span v-if="item.status=='DELIVERY'">已签收</span>
+                             <span v-if="item.status=='OVER'">已签收</span>
                           </td>
                           <td>
+                            <div class="btn btn-sm btn-danger"  @click="orderCheckShowModal(index)" v-if="item.payType=='check'">审核</div>
                             <div class="btn btn-sm btn-primary" @click="showPayModal(index)" v-if="item.payType=='none'">收款</div>
 						                <div class="btn btn-sm btn-default" @click="showChangePriceodal(index)"  v-if="item.status=='WAIT'">改价</div>
                             <div class="btn btn-sm btn-default" @click="showDetailModal(index)">详情</div>
-                            <div class="btn btn-sm btn-primary" @click="showSendModal(index)" v-if="item.status=='WAIT'">发货</div>
+                            <div class="btn btn-sm btn-primary" @click="showSendModal(index)" v-if="item.status=='WAIT'&&item.payType!='none'">发货</div>
                             <div class="btn btn-sm btn-default" @click="showViewModal(index)" v-if="item.status=='DELIVERY'">物流</div>
                           </td>
                         </tr>
@@ -172,21 +173,20 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">支付方式</label>
                           <div class="col-sm-10">
-                            <label class="radio-inline">
-                              <input type="radio" value="option1" id="inlineCheckbox1">
-                              暂未付款 </label>
-                            <label class="radio-inline">
-                              <input type="radio" value="option1" id="inlineCheckbox1">
-                              微信 </label>
-                            <label class="radio-inline">
-                              <input type="radio" value="option1" id="inlineCheckbox1">
-                              支付宝 </label>
+                            <label class="radio-inline" v-if="detai.payType=='none'">
+                              <input type="radio" checked >暂未付款 </label>
+                            <label class="radio-inline"  v-if="detai.payType=='wechat'">
+                              <input type="radio" checked>微信 </label>
+                            <label class="radio-inline"  v-if="detai.payType=='alipay'">
+                              <input type="radio" checked>支付宝 </label>
+                            <label class="radio-inline"  v-if="detai.payType=='check'">
+                              <input type="radio" checked>付款待审核 </label>
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-2 control-label">微信账号/支付宝账号</label>
+                          <label class="col-sm-2 control-label">微信/支付宝账号</label>
                           <div class="col-sm-10">
-                            <input type="text" value="123459791" class="form-control" disabled="">
+                            <!-- <input type="text" value="{{detail.wechat||detail.alipay}}" class="form-control" disabled=""> -->
                           </div>
                         </div>
                         <div class="form-group">
@@ -298,7 +298,7 @@
                           </div>
                           <div class="form-group">
                             <label>收货电话</label>
-                            <input type="text" placeholder="请输入收货电话" class="form-control"  v-model="order.recipientsPhone" maxlength="20">
+                            <input type="text" placeholder="请输入收货电话" class="form-control"  v-model="order.recipientsPhone" maxlength="11">
                           </div>
                           <div class="form-group">
                             <label>收货地址</label>
@@ -323,7 +323,7 @@
                                   <input type="radio" @click="payTypeChange('none')"  name="inlineCheckbox1">
                                   暂未付款 </label>
                                 <label class="radio-inline">
-                                  <input type="radio"  @click="payTypeChange('wechart')"  name="inlineCheckbox1">
+                                  <input type="radio"  @click="payTypeChange('wechat')"  name="inlineCheckbox1">
                                   微信 </label>
                                 <label class="radio-inline">
                                   <input type="radio"  @click="payTypeChange('alipay')" name="inlineCheckbox1">
@@ -331,8 +331,8 @@
                               </div>
                           </div>
                           <div class="form-group" v-if="order.payType!=='none'">
-                            <label>{{order.payType==='wechart'?'微信账号':'支付宝账号'}}</label>
-                            <input type="text"  class="form-control" v-model="order.account" maxlength="20">
+                            <label>{{order.payType==='wechat'?'微信账号':'支付宝账号'}}</label>
+                            <input type="text"  class="form-control" v-model="order.payAccount" maxlength="20">
                           </div>
                           <div class="form-group" v-if="order.payType!=='none'">
                             <label>支付金额</label>
@@ -373,7 +373,7 @@
                               <select class="form-control" v-model="rearch.payType">
                                 <option value="">全部</option>
                                 <option value="none">暂未付款</option>
-                                <option value="wechart">微信</option>
+                                <option value="wechat">微信</option>
                                 <option value="alipay">支付宝</option>
                               </select>
                             </div>
@@ -395,12 +395,107 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div>    
           
+          <!-- 付款待审核 -->
+          <div id="review" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title">审核</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form role="form" class="form-horizontal">
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货人</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="张三" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货电话</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="15242612898" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">收货地址</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="高新园区招商兰溪谷" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">订单内容</label>
+                          <div class="col-sm-10">
+                            <textarea class="form-control" disabled="">麦顿金典1袋</textarea>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">分销商</label>
+                          <div class="col-sm-10">
+                            <select class="form-control" disabled="">
+                              <option>分销商1</option>
+                            
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">支付方式</label>
+                          <div class="col-sm-10">
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              暂未付款 </label>
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              微信 </label>
+                            <label class="radio-inline">
+                              <input type="radio" value="option1" id="inlineCheckbox1">
+                              支付宝 </label>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">微信账号/支付宝账号</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="123459791" class="form-control" disabled="">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">支付金额</label>
+                          <div class="col-sm-10">
+                            <input type="text" value="100" class="form-control">
+                          </div>
+                        </div>
+                  <div class="form-group">
+                          <label class="col-sm-2 control-label">付款截图</label>
+                          <div class="col-sm-10">
+                              <img src="img/gallery/2s.jpg" class="img-lg" data-toggle="modal" href="#look-img">
+                          </div>
+                        </div>
+                      </form>
+                  
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary">审核通过</button>
+                  <button type="button" class="btn btn-white" data-dismiss="modal" data-toggle="modal" href="#reason">审核未通过</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 付款待审核 end-->
+        
         </div>
       </div>
     </div>
   </div>
+
+
+
 </template>
 
 <script>
@@ -458,14 +553,14 @@ export default {
         recipientsAddress: "",
         content: "",
         payType: "",
-        account: "",
+        payAccount: "",
         payment: ""
       },
       detai: {},
       changePrice: {
         orderId: 0,
         oldPayment: "",
-        payment: 0,
+        payment: "0",
         comment: ""
       },
       distributorList: [], //新增订单时分销商的列表
@@ -479,18 +574,34 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    shwoSaveModal:function(){
+      this.order = {
+        recipients: "",
+        recipientsPhone: "",
+        recipientsAddress: "",
+        content: "",
+        payType: "",
+        payAccount: "",
+        payment: ""
+      }
+      $("#order-add").modal("show");
+    },
     handleChange(date) {
       this.datePicker = date;
     },
     showPayModal: function(index) {
-      $("#").modal("show");
+      
+      $("#order-add").modal("show");
+    },
+    orderCheckShowModal: function(index) {
+      $("#review").modal('show');
     },
     showChangePriceodal: function(index) {
       let _this = this;
       let cur = _this.list[index];
       _this.changePrice.orderId = cur.id;
       _this.changePrice.oldPayment = cur.payment;
-      _this.changePrice.payment = 0;
+      _this.changePrice.payment = "0";
       _this.changePrice.comment = "";
       $("#edit-price").modal("show");
     },
@@ -501,9 +612,15 @@ export default {
         _this.$toast.warning("金额格式不正确");
         return false;
       }
+      let param = [];
+      param.push('orderId=' + _this.changePrice.orderId);
+      param.push('payment=' + _this.changePrice.payment);
+      param.push('comment=' + _this.changePrice.comment);
+
+
       _this.loading = true;
       _this.$axios
-        .post("orders/pay",_this.changePrice)
+        .post("orders/pay?" + param.join('&'))
         .then(result => {
           let res = result.data;
           switch (res.code) {
@@ -511,7 +628,7 @@ export default {
               {
                 _this.$toast.success("操作成功");
                 _this.listData();
-                 $("#edit-price").modal("hide");
+                $("#edit-price").modal("hide");
               }
               break;
             default: {
@@ -577,7 +694,7 @@ export default {
           {
           }
           break;
-        case "wechart":
+        case "wechat":
           {
           }
           break;
@@ -590,8 +707,9 @@ export default {
       let recipientsAddress = _this.order.recipientsAddress.trim();
       let content = _this.order.content.trim();
       let payType = _this.order.payType;
-      let account = _this.order.account.trim();
+      let payAccount = _this.order.payAccount.trim();
       let payment = _this.order.payment.trim();
+      let distributorId = _this.distributorId;
 
       if (recipients === "") {
         _this.$toast.warning("收货人不可为空");
@@ -606,7 +724,7 @@ export default {
         return false;
       }
       if (payType != "none") {
-        if (account === "") {
+        if (payAccount === "") {
           _this.$toast.warning("账号不可为空");
           return false;
         }
@@ -616,17 +734,22 @@ export default {
         }
       }
 
+      let param = {
+        recipients: recipients,
+        recipientsPhone: recipientsPhone,
+        recipientsAddress: recipientsAddress,
+        content: content,
+        payType: payType,
+        payAccount: payAccount,
+        payment: payment,
+        isAgent: false
+      };
+      if (distributorId) {
+        param.agentId = distributorId;
+      }
+
       _this.$axios
-        .post("orders", {
-          recipients: recipients,
-          recipientsPhone: recipientsPhone,
-          recipientsAddress: recipientsAddress,
-          content: content,
-          payType: payType,
-          account: account,
-          payment: payment,
-          isAgent: false
-        })
+        .post("orders", param)
         .then(result => {
           let res = result.data;
           switch (res.code) {
@@ -661,7 +784,7 @@ export default {
         recipientsAddress: "",
         content: "",
         payType: "",
-        account: "",
+        payAccount: "",
         payment: ""
       };
       $("#order-add").madal("show");
