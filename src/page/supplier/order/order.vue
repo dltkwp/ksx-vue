@@ -63,7 +63,7 @@
                       <td v-if="item.payment==null">-</td>
                       <td v-if="item.payment!==null">￥{{item.payment}}</td>
                       <td>
-                        {{item.payType=='none'?'':item.payType}}
+                        {{item.payType=='none'||item.payType=='check'?'':item.payType}}
                         <span class="label label-danger" v-if="item.payType=='none'">暂未付款</span>
                         <span class="label label-danger" v-if="item.payType=='check'">付款待审核</span>
                       </td>
@@ -410,71 +410,67 @@
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货人</label>
                           <div class="col-sm-10">
-                            <input type="text" value="张三" class="form-control" disabled="">
+                            <input type="text" v-bind:value="detail.recipients" class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货电话</label>
                           <div class="col-sm-10">
-                            <input type="text" value="15242612898" class="form-control" disabled="">
+                            <input type="text" v-bind:value="detail.recipientsPhone"  class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">收货地址</label>
                           <div class="col-sm-10">
-                            <input type="text" value="高新园区招商兰溪谷" class="form-control" disabled="">
+                            <input type="text" v-bind:value="detail.recipientsAddress"  class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">订单内容</label>
                           <div class="col-sm-10">
-                            <textarea class="form-control" disabled="">麦顿金典1袋</textarea>
+                            <textarea class="form-control" disabled v-html="detail.content"></textarea>
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">分销商</label>
                           <div class="col-sm-10">
-                            <select class="form-control" disabled="">
-                                <option>分销商1</option>
-                              
+                            <select class="form-control" disabled="" v-for="(item,index) in detail.orderSupplierList" :key="index">
+                                <option>{{item.realname}}</option>
                               </select>
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">支付方式</label>
                           <div class="col-sm-10">
-                            <label class="radio-inline">
-                                <input type="radio" value="option1" >
-                                暂未付款 </label>
-                            <label class="radio-inline">
-                                <input type="radio" value="option1" >
-                                微信 </label>
-                            <label class="radio-inline">
-                                <input type="radio" value="option1" >
-                                支付宝 </label>
+                           <label class="radio-inline" v-if="detail.payType=='none'">
+                                <input type="radio" checked >暂未付款 </label>
+                            <label class="radio-inline" v-if="detail.payType=='wechat'">
+                                <input type="radio" checked>微信 </label>
+                            <label class="radio-inline" v-if="detail.payType=='alipay'">
+                                <input type="radio" checked>支付宝 </label>
+                            <label class="radio-inline" v-if="detail.payType=='check'">
+                                <input type="radio" checked>付款待审核 </label>
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">微信账号/支付宝账号</label>
                           <div class="col-sm-10">
-                            <input type="text" value="123459791" class="form-control" disabled="">
+                            <input type="text" v-bind:value="detail.payAccount||''"  class="form-control" disabled="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label class="col-sm-2 control-label">支付金额</label>
                           <div class="col-sm-10">
-                            <input type="text" value="100" class="form-control">
+                            <input type="text" v-bind:value="detail.payment"  class="form-control">
                           </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" v-if="detail.payVoucherUrl">
                           <label class="col-sm-2 control-label">付款截图</label>
                           <div class="col-sm-10">
-                            <img src="" class="img-lg">
+                            <img v-bind:src="detail.payVoucherUrl" class="img-lg" @click="vieImage(detail.payVoucherUrl)">
                           </div>
                         </div>
                       </form>
-  
-  
                     </div>
                   </div>
                 </div>
@@ -525,9 +521,8 @@
                           <div class="col-sm-10">
                             <div class="fileinput fileinput-new" data-provides="fileinput"  @click="uploadImage()">
                               <span class="btn btn-default btn-file"><span class="fileinput-new">上传附件</span></span>
-                              {{pay.payVoucher.payUrl}}
+                              {{pay.payVoucherUrl}}
                             </div>
-
                           </div>
                         </div>
                       </form>
@@ -535,13 +530,23 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-primary">保存</button>
+                  <button type="button" class="btn btn-primary" @click="savePaySubmit" v-bind:disabled="loading" v-bind:readonly="loading">保存</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
                 </div>
               </div>
             </div>
           </div>
           <!-- 收款操作 结束 -->
+
+          <!-- 查看大图 Start-->
+          <div id="look-img" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <img v-bind:src="viewImageUrl" style="width:100%" data-dismiss="modal">
+              </div>
+            </div>
+          </div>
+          <!-- 查看大图 End-->
   
         </div>
       </div>
@@ -553,589 +558,656 @@
 </template>
 
 <script>
-  import {
-    mapActions,
-    mapGetters
-  } from "vuex";
-  import * as types from "@/store/mutation-types.js";
-  
-  import vMenus from "@/components/menus/menus.vue";
-  import vTop from "@/components/top/top.vue";
-  import vFoot from "@/components/foot/foot.vue";
-  import vEmpty from "@/components/empty/empty.vue";
-  
-  import pagination from "@/components/pagination/pagination.vue";
-  import {
+import { mapActions, mapGetters } from "vuex";
+import * as types from "@/store/mutation-types.js";
+
+import vMenus from "@/components/menus/menus.vue";
+import vTop from "@/components/top/top.vue";
+import vFoot from "@/components/foot/foot.vue";
+import vEmpty from "@/components/empty/empty.vue";
+
+import pagination from "@/components/pagination/pagination.vue";
+import { DatePicker } from "iview";
+
+export default {
+  components: {
+    vMenus,
+    vTop,
+    vFoot,
+    vEmpty,
+    pagination,
     DatePicker
-  } from "iview";
-  
-  export default {
-    components: {
-      vMenus,
-      vTop,
-      vFoot,
-      vEmpty,
-      pagination,
-      DatePicker
+  },
+  data() {
+    return {
+      loading: false,
+      list: [],
+      parentTotalPage: 0,
+      parentCurrentpage: 1,
+      curIndex: -1,
+      datePicker: ["", ""],
+      rearch: {
+        payType: "",
+        status: "",
+        content: "",
+        recipients: "",
+        distributor: "",
+        showStatusText: "",
+        isSupplier: 1,
+        distributorList: [],
+        distributorId: ""
+      },
+      send: {
+        company: "",
+        expressOrder: ""
+      },
+      view: {
+        company: "",
+        expressOrder: "",
+        id: ""
+      },
+      order: {
+        recipients: "",
+        recipientsPhone: "",
+        recipientsAddress: "",
+        content: "",
+        payType: "",
+        payAccount: "",
+        payment: ""
+      },
+      detail: {},
+      changePrice: {
+        orderId: 0,
+        oldPayment: "",
+        payment: "0",
+        comment: ""
+      },
+      distributorList: [], //新增订单时分销商的列表
+      distributorId: "", //新增订单时所选择的
+      pay: {
+        // 收款模型
+        payType: "wechat", //  支付类型
+        payAccount: "", //  账号体系
+        payVoucher: "", //  支付凭证
+        payment: "", // 支付金额
+        payIndex: -1,
+        payVoucherUrl: ""
+      },
+      viewImageUrl:""
+    };
+  },
+  mounted() {
+    this.SHIFT_LOADING();
+    this.listData();
+    this.getDistributorList();
+  },
+  methods: {
+    ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    vieImage:function(url){
+      let _this = this;
+      _this.viewImageUrl = url;
+      $("#look-img").modal('show');
     },
-    data() {
-      return {
-        loading: false,
-        list: [],
-        parentTotalPage: 0,
-        parentCurrentpage: 1,
-        curIndex: -1,
-        datePicker: ["", ""],
-        rearch: {
-          payType: "",
-          status: "",
-          content: "",
-          recipients: "",
-          distributor: "",
-          showStatusText: "",
-          isSupplier: 1,
-          distributorList: [],
-          distributorId: ""
-        },
-        send: {
-          company: "",
-          expressOrder: ""
-        },
-        view: {
-          company: "",
-          expressOrder: "",
-          id: ""
-        },
-        order: {
-          recipients: "",
-          recipientsPhone: "",
-          recipientsAddress: "",
-          content: "",
-          payType: "",
-          payAccount: "",
-          payment: ""
-        },
-        detail: {},
-        changePrice: {
-          orderId: 0,
-          oldPayment: "",
-          payment: "0",
-          comment: ""
-        },
-        distributorList: [], //新增订单时分销商的列表
-        distributorId: "", //新增订单时所选择的
-        pay:{               // 收款模型
-          payType:'wechat',       //  支付类型
-          payAccount:'',    //  账号体系
-          payVoucher:'',    //  支付凭证
-          payment:'',       // 支付金额
-          payIndex:-1,
-          payUrl:''
-        },
+    shwoSaveModal: function() {
+      this.order = {
+        recipients: "",
+        recipientsPhone: "",
+        recipientsAddress: "",
+        content: "",
+        payType: "",
+        payAccount: "",
+        payment: ""
       };
+      $("#order-add").modal("show");
     },
-    mounted() {
-      this.SHIFT_LOADING();
-      this.listData();
-      this.getDistributorList();
+    handleChange(date) {
+      this.datePicker = date;
     },
-    methods: {
-      ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
-      shwoSaveModal: function() {
-        this.order = {
-          recipients: "",
-          recipientsPhone: "",
-          recipientsAddress: "",
-          content: "",
-          payType: "",
-          payAccount: "",
-          payment: ""
-        };
-        $("#order-add").modal("show");
-      },
-      handleChange(date) {
-        this.datePicker = date;
-      },
-      savePaySubmit: function (){
-         let _this = this;
-         let payAccount = _this.pay.payAccount;
-         let payVoucher = _this.pay.payVoucher;
-         let payment = _this.pay.payment;
+    savePaySubmit: function() {
+      let _this = this;
+      let payAccount = _this.pay.payAccount.trim();
+      let payVoucher = _this.pay.payVoucher;
+      let payment = _this.pay.payment;
 
+      if (payAccount == "") {
+        _this.$toast.warning("账号不可为空");
+        return false;
+      }
+      if (!priceValidate(payment)) {
+        _this.$toast.warning("金额格式不正确");
+        return false;
+      }
 
+      if (payVoucher == "") {
+        _this.$toast.warning("请上传支付凭证");
+        return false;
+      }
 
-      },
-      showPayModal: function(index) {
-        this.pay = {               // 收款模型
-          payType:'wechat',       //  支付类型
-          payAccount:'',    //  账号体系
-          payVoucher:'',    //  支付凭证
-          payment:'',       // 支付金额
-          payIndex: index,
-          payUrl:''
-        }
-        $("#pay").modal("show");
-      },
-      orderCheckShowModal: function(index) {
-        $("#review").modal("show");
-      },
-      showChangePriceodal: function(index) {
-        let _this = this;
-        let cur = _this.list[index];
-        _this.changePrice.orderId = cur.id;
-        _this.changePrice.oldPayment = cur.payment;
-        _this.changePrice.payment = "0";
-        _this.changePrice.comment = "";
-        $("#edit-price").modal("show");
-      },
-      changePriceSave: function() {
-        let _this = this;
-        let payment = _this.changePrice.payment.trim();
-        if (!priceValidate(payment)) {
-          _this.$toast.warning("金额格式不正确");
-          return false;
-        }
-        let param = [];
-        param.push("orderId=" + _this.changePrice.orderId);
-        param.push("payment=" + _this.changePrice.payment);
-        param.push("comment=" + _this.changePrice.comment);
-  
-        _this.loading = true;
-        _this.$axios
-          .post("orders/pay?" + param.join("&"))
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.listData();
-                  $("#edit-price").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      showDetailModal: function(index) {
-        $("#order-detail").modal("show");
-        this.getDetail(this.list[index].id);
-      },
-      advRearchSubmit: function() {
-        this.parentCurrentpage = 1;
-        this.listData();
-        $("#search-more").modal("hide");
-      },
-      showAdvRearch: function() {
-        //清理下界面元素 并弹出对话框
-        $("#search-more").modal("show");
-      },
-      orderStatusChange: function(key) {
-        this.rearch.status = key;
-        switch (key) {
-          case "":
-            {
-              this.rearch.showStatusText = "全部订单";
-            }
-            break;
-          case "WAIT":
-            {
-              this.rearch.showStatusText = "等待发货";
-            }
-            break;
-          case "DELIVERY":
-            {
-              this.rearch.showStatusText = "已发货";
-            }
-            break;
-          case "RECEIVED":
-            {
-              this.rearch.showStatusText = "已签收";
-            }
-            break;
-        }
-        this.parentCurrentpage = 1;
-        this.listData();
-      },
-      payTypeChange: function(key) {
-        this.order.payType = key;
-        switch (key) {
-          case "none":
-            {}
-            break;
-          case "alipay":
-            {}
-            break;
-          case "wechat":
-            {}
-            break;
-        }
-      },
-      orderSave: function() {
-        let _this = this;
-        let recipients = _this.order.recipients.trim();
-        let recipientsPhone = _this.order.recipientsPhone.trim();
-        let recipientsAddress = _this.order.recipientsAddress.trim();
-        let content = _this.order.content.trim();
-        let payType = _this.order.payType;
-        let payAccount = _this.order.payAccount.trim();
-        let payment = _this.order.payment.trim();
-        let distributorId = _this.distributorId;
-  
-        if (recipients === "") {
-          _this.$toast.warning("收货人不可为空");
-          return false;
-        }
-        if (!mobileValidate(recipientsPhone)) {
-          _this.$toast.warning("收货电话格式不正确");
-          return false;
-        }
-        if (recipientsAddress === "") {
-          _this.$toast.warning("收货地址不可为空");
-          return false;
-        }
-        if (payType != "none") {
-          if (payAccount === "") {
-            _this.$toast.warning("账号不可为空");
-            return false;
-          }
-          if (!priceValidate(payment)) {
-            _this.$toast.warning("支付金额格式不正确");
-            return false;
-          }
-        }
-  
-        let param = {
-          recipients: recipients,
-          recipientsPhone: recipientsPhone,
-          recipientsAddress: recipientsAddress,
-          content: content,
-          payType: payType,
-          payAccount: payAccount,
-          payment: payment,
-          isAgent: false
-        };
-        if (distributorId) {
-          param.agentId = distributorId;
-        }
-  
-        _this.$axios
-          .post("orders", param)
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.parentCurrentpage = 1;
-                  _this.listData();
-                  $("#order-add").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      rearchSubmit: function() {
-        this.parentCurrentpage = 1;
-        this.listData();
-      },
-      showOrderSave: function() {
-        this.order = {
-          recipients: "",
-          recipientsPhone: "",
-          recipientsAddress: "",
-          content: "",
-          payType: "",
-          payAccount: "",
-          payment: ""
-        };
-        $("#order-add").madal("show");
-      },
-      showSendModal: function(index) {
-        this.curIndex = index;
-        this.send.company = "";
-        this.send.expressOrder = "";
-        $("#modal-send").modal("show");
-      },
-      sendSubmit: function() {
-        let _this = this;
-        let company = _this.send.company.trim();
-        let expressOrder = _this.send.expressOrder.trim();
-        if (company.trim() === "") {
-          _this.$toast.warning("快递公司不可为空");
-          return false;
-        }
-        if (expressOrder.trim() === "") {
-          _this.$toast.warning("快递单号不可为空");
-          return false;
-        }
-        let orderId = 0;
-        let curOrder = _this.list[_this.curIndex];
-        if (curOrder) {
-          orderId = curOrder.id;
-        }
-  
-        _this.loading = true;
-        let params = [];
-        params.push("company=" + company);
-        params.push("expressOrder=" + expressOrder);
-        params.push("orderId=" + orderId);
-        _this.$axios
-          .post("delivery?" + params.join("&"))
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.listData();
-                  $("#modal-send").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      showViewModal: function(index) {
-        this.curIndex = index;
-        this.getExpressOrder();
-      },
-      getExpressOrder: function() {
-        let _this = this;
-        let cur = _this.list[_this.curIndex];
-        let orderId = cur.id;
-        _this.$axios
-          .get("delivery?orderId=" + orderId)
-          .then(result => {
-            $("#modal-send-view").modal("show");
-            let data = result.data;
-            data.isEdit = cur.status != "OVER";
-            _this.view = data;
-            // let res = result.data;
-            // switch (res.code) {
-            //   case 200:
-            //     {
-            //        cb&&cb(res.data);
-            //     }
-            //     break;
-            //   default:
-            //     {
-            //       _this.$toast.error(res.msg);
-            //     }
-            // }
-          })
-          .catch(err => {});
-      },
-      updateSubmit: function() {
-        let _this = this;
-        let company = _this.view.company.trim();
-        let expressOrder = _this.view.expressOrder.trim();
-        if (company.trim() === "") {
-          _this.$toast.warning("快递公司不可为空");
-          return false;
-        }
-        if (expressOrder.trim() === "") {
-          _this.$toast.warning("快递单号不可为空");
-          return false;
-        }
-        _this.loading = true;
-        let params = [];
-        params.push("company=" + company);
-        params.push("expressOrder=" + expressOrder);
-        params.push("id=" + _this.view.id);
-        params.push("orderId=" + _this.view.orderId);
-  
-        _this.$axios
-          .put("delivery?" + params.join("&"))
-          .then(result => {
-            let res = result.data;
-            switch (res.code) {
-              case 200:
-                {
-                  _this.$toast.success("操作成功");
-                  _this.listData();
-                  $("#modal-send-view").modal("hide");
-                }
-                break;
-              default:
-                {
-                  _this.$toast.error(res.msg);
-                }
-            }
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.loading = false;
-            _this.SHIFT_LOADING();
-          });
-      },
-      parentCallback(cPage) {
-        this.parentCurrentpage = cPage;
-        this.listData();
-      },
-      getDetail: function(orderId) {
-        let _this = this;
-        _this.PUSH_LOADING();
-        _this.$axios
-          .get("orders/" + orderId)
-          .then(result => {
-            let detail = result.data;
-            if(detail.payVoucher){
-              detail.payVoucher = imgCdn + detail.payVoucher;
-            }
-            _this.detail = detail;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.SHIFT_LOADING();
-          });
-      },
-      listData() {
-        let _this = this;
-        let param = [];
-        param.push("pageNum=" + _this.parentCurrentpage);
-        param.push("pageSize=" + 15);
-        param.push("isSupplier=1");
-        if (_this.rearch.payType) {
-          param.push("payType=" + _this.rearch.payType);
-        }
-        if (_this.rearch.status) {
-          param.push("status=" + _this.rearch.status);
-        }
-        if (_this.rearch.content) {
-          param.push("content=" + _this.rearch.content);
-        }
-        if (_this.rearch.recipients) {
-          param.push("recipients=" + _this.rearch.recipients);
-        }
-        if (_this.rearch.distributor) {
-          param.push("distributor=" + _this.rearch.distributor);
-        }
-        let st = _this.datePicker[0];
-        let et = _this.datePicker[1];
-        if (st && et) {
-          param.push("st=" + st + " 00:00:00");
-          param.push("et=" + et + " 23:59:59");
-        }
-  
-        _this.PUSH_LOADING();
-        _this.$axios
-          .get("orders?" + param.join("&"))
-          .then(result => {
-            let res = result.data;
-            _this.parentTotalPage = res.pages;
-            let tempList = res.list;
-            _this.$lodash.forEach(tempList, function(item) {
-              item.timeStr = _this
-                .$moment(item.createDate)
-                .format("YYYY/MM/DD HH:mm");
-            });
-            _this.list = tempList;
-            _this.SHIFT_LOADING();
-          })
-          .catch(err => {
-            _this.SHIFT_LOADING();
-          });
-      },
-      getDistributorList: function() {
-        let _this = this;
-        let param = [];
-        param.push("pageNum=1");
-        param.push("pageSize=1000");
-        _this.$axios
-          .get("user/dealer?" + param.join("&"))
-          .then(result => {
-            let res = result.data;
-            _this.distributorList = res.list;
-            _this.rearch.distributorList = _.$lodash.deepClone(res.list);
-  
-            if (res.list.length > 0) {
-              _this.distributorId = res.list[0].id;
-              _this.rearch.distributorId = res.list[0].id;
-            }
-          })
-          .catch(err => {});
-      },
-      uploadImage: function() {
-        $("#uploadFile").val(null);
-        if ($("#uploadFile").val()) {
-          document.getElementById("uploadImgForm").reset();
-        }
-        document.getElementById("uploadFile").click();
-      },
-      imgUploadFileChange: function(event) {
-        let _this = this;
-        if (event) {
-          var filePath = "";
-          var size = 0;
-          var updatingCount = 0;
+      let cur = _this.list[_this.pay.payIndex];
+      let param = [
+        "payment=" + payment,
+        "payType=" + _this.pay.payType,
+        "payAccount=" + payAccount,
+        "payVoucher=" + payVoucher
+      ];
 
-          if (event && event.target && event.target.files) {
-            var file = event.target.files[0];
-            size = file.size || 0;
-            filePath = file.name;
-            var index = filePath.lastIndexOf(".");
-            var suffix = filePath.substring(index, filePath.length);
-
-            if (!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(suffix)) {
-              _this.$toast.warning("图片类型必须是.gif,jpeg,jpg,png中的一种");
-              return false;
-            }
-
-            var imgSize = size / 1024 / 1024;
-            if (imgSize > 3) {
-              _this.$toast.warning("图片大小超过3M,请上传小于3M的图片.");
-              return false;
-            }
-            var formData = new FormData();
-            formData.append("file", file);
-
-            let _this = this;
-            _this.$axios
-              .post("upload", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-              })
-              .then(result => {
-                let res = result.data;
-                _this.pay.payVoucher.payUrl = imgCdn + res.fileCode;
-                _this.pay.payVoucher = res.fileCode;
-
+      _this.loading = true;
+      _this.$axios
+        .get("/orders/" + cur.id + "/pay?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
                 _this.$toast.success("操作成功");
-              })
-              .catch(err => {});
+                $("#pay").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
           }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    showPayModal: function(index) {
+      this.pay = {
+        // 收款模型
+        payType: "wechat", //  支付类型
+        payAccount: "", //  账号体系
+        payVoucher: "", //  支付凭证
+        payment: "", // 支付金额
+        payIndex: index,
+        payVoucherUrl: ""
+      };
+      $("#pay").modal("show");
+    },
+    orderCheckShowModal: function(index) {
+      let _this = this;
+      let curIndex = index;
+      let cur = _this.list[index];
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("/orders/" + cur.id + "/review")
+        .then(result => {
+          let detail = result.data;
+          if (detail.payVoucher) {
+            detail.payVoucherUrl = imgCdn + detail.payVoucher;
+          }
+          
+          // 测试代码
+          detail.payVoucherUrl = "http://easy-time.oss-cn-beijing.aliyuncs.com/product/CE0655146C634D01AE493CD50E70C07F.jpg";
+
+          _this.detail = detail;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+      $("#review").modal("show");
+    },
+    showChangePriceodal: function(index) {
+      let _this = this;
+      let cur = _this.list[index];
+      _this.changePrice.orderId = cur.id;
+      _this.changePrice.oldPayment = cur.payment;
+      _this.changePrice.payment = "0";
+      _this.changePrice.comment = "";
+      $("#edit-price").modal("show");
+    },
+    changePriceSave: function() {
+      let _this = this;
+      let payment = _this.changePrice.payment.trim();
+      if (!priceValidate(payment)) {
+        _this.$toast.warning("金额格式不正确");
+        return false;
+      }
+      let param = [];
+      param.push("orderId=" + _this.changePrice.orderId);
+      param.push("payment=" + _this.changePrice.payment);
+      param.push("comment=" + _this.changePrice.comment);
+
+      _this.loading = true;
+      _this.$axios
+        .post("orders/pay?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                $("#edit-price").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    showDetailModal: function(index) {
+      $("#order-detail").modal("show");
+      this.getDetail(this.list[index].id);
+    },
+    advRearchSubmit: function() {
+      this.parentCurrentpage = 1;
+      this.listData();
+      $("#search-more").modal("hide");
+    },
+    showAdvRearch: function() {
+      //清理下界面元素 并弹出对话框
+      $("#search-more").modal("show");
+    },
+    orderStatusChange: function(key) {
+      this.rearch.status = key;
+      switch (key) {
+        case "":
+          {
+            this.rearch.showStatusText = "全部订单";
+          }
+          break;
+        case "WAIT":
+          {
+            this.rearch.showStatusText = "等待发货";
+          }
+          break;
+        case "DELIVERY":
+          {
+            this.rearch.showStatusText = "已发货";
+          }
+          break;
+        case "RECEIVED":
+          {
+            this.rearch.showStatusText = "已签收";
+          }
+          break;
+      }
+      this.parentCurrentpage = 1;
+      this.listData();
+    },
+    payTypeChange: function(key) {
+      this.order.payType = key;
+      switch (key) {
+        case "none":
+          {
+          }
+          break;
+        case "alipay":
+          {
+          }
+          break;
+        case "wechat":
+          {
+          }
+          break;
+      }
+    },
+    orderSave: function() {
+      let _this = this;
+      let recipients = _this.order.recipients.trim();
+      let recipientsPhone = _this.order.recipientsPhone.trim();
+      let recipientsAddress = _this.order.recipientsAddress.trim();
+      let content = _this.order.content.trim();
+      let payType = _this.order.payType;
+      let payAccount = _this.order.payAccount.trim();
+      let payment = _this.order.payment.trim();
+      let distributorId = _this.distributorId;
+
+      if (recipients === "") {
+        _this.$toast.warning("收货人不可为空");
+        return false;
+      }
+      if (!mobileValidate(recipientsPhone)) {
+        _this.$toast.warning("收货电话格式不正确");
+        return false;
+      }
+      if (recipientsAddress === "") {
+        _this.$toast.warning("收货地址不可为空");
+        return false;
+      }
+      if (payType != "none") {
+        if (payAccount === "") {
+          _this.$toast.warning("账号不可为空");
+          return false;
+        }
+        if (!priceValidate(payment)) {
+          _this.$toast.warning("支付金额格式不正确");
+          return false;
+        }
+      }
+
+      let param = {
+        recipients: recipients,
+        recipientsPhone: recipientsPhone,
+        recipientsAddress: recipientsAddress,
+        content: content,
+        payType: payType,
+        payAccount: payAccount,
+        payment: payment,
+        isAgent: false
+      };
+      if (distributorId) {
+        param.agentId = distributorId;
+      }
+
+      _this.$axios
+        .post("orders", param)
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.parentCurrentpage = 1;
+                _this.listData();
+                $("#order-add").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    rearchSubmit: function() {
+      this.parentCurrentpage = 1;
+      this.listData();
+    },
+    showOrderSave: function() {
+      this.order = {
+        recipients: "",
+        recipientsPhone: "",
+        recipientsAddress: "",
+        content: "",
+        payType: "",
+        payAccount: "",
+        payment: ""
+      };
+      $("#order-add").madal("show");
+    },
+    showSendModal: function(index) {
+      this.curIndex = index;
+      this.send.company = "";
+      this.send.expressOrder = "";
+      $("#modal-send").modal("show");
+    },
+    sendSubmit: function() {
+      let _this = this;
+      let company = _this.send.company.trim();
+      let expressOrder = _this.send.expressOrder.trim();
+      if (company.trim() === "") {
+        _this.$toast.warning("快递公司不可为空");
+        return false;
+      }
+      if (expressOrder.trim() === "") {
+        _this.$toast.warning("快递单号不可为空");
+        return false;
+      }
+      let orderId = 0;
+      let curOrder = _this.list[_this.curIndex];
+      if (curOrder) {
+        orderId = curOrder.id;
+      }
+
+      _this.loading = true;
+      let params = [];
+      params.push("company=" + company);
+      params.push("expressOrder=" + expressOrder);
+      params.push("orderId=" + orderId);
+      _this.$axios
+        .post("delivery?" + params.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                $("#modal-send").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    showViewModal: function(index) {
+      this.curIndex = index;
+      this.getExpressOrder();
+    },
+    getExpressOrder: function() {
+      let _this = this;
+      let cur = _this.list[_this.curIndex];
+      let orderId = cur.id;
+      _this.$axios
+        .get("delivery?orderId=" + orderId)
+        .then(result => {
+          $("#modal-send-view").modal("show");
+          let data = result.data;
+          data.isEdit = cur.status != "OVER";
+          _this.view = data;
+          // let res = result.data;
+          // switch (res.code) {
+          //   case 200:
+          //     {
+          //        cb&&cb(res.data);
+          //     }
+          //     break;
+          //   default:
+          //     {
+          //       _this.$toast.error(res.msg);
+          //     }
+          // }
+        })
+        .catch(err => {});
+    },
+    updateSubmit: function() {
+      let _this = this;
+      let company = _this.view.company.trim();
+      let expressOrder = _this.view.expressOrder.trim();
+      if (company.trim() === "") {
+        _this.$toast.warning("快递公司不可为空");
+        return false;
+      }
+      if (expressOrder.trim() === "") {
+        _this.$toast.warning("快递单号不可为空");
+        return false;
+      }
+      _this.loading = true;
+      let params = [];
+      params.push("company=" + company);
+      params.push("expressOrder=" + expressOrder);
+      params.push("id=" + _this.view.id);
+      params.push("orderId=" + _this.view.orderId);
+
+      _this.$axios
+        .put("delivery?" + params.join("&"))
+        .then(result => {
+          let res = result.data;
+          switch (res.code) {
+            case 200:
+              {
+                _this.$toast.success("操作成功");
+                _this.listData();
+                $("#modal-send-view").modal("hide");
+              }
+              break;
+            default: {
+              _this.$toast.error(res.msg);
+            }
+          }
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
+    parentCallback(cPage) {
+      this.parentCurrentpage = cPage;
+      this.listData();
+    },
+    getDetail: function(orderId) {
+      let _this = this;
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("orders/" + orderId)
+        .then(result => {
+          let detail = result.data;
+          if (detail.payVoucher) {
+            detail.payVoucher = imgCdn + detail.payVoucher;
+          }
+          _this.detail = detail;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    },
+    listData() {
+      let _this = this;
+      let param = [];
+      param.push("pageNum=" + _this.parentCurrentpage);
+      param.push("pageSize=" + 15);
+      param.push("isSupplier=1");
+      if (_this.rearch.payType) {
+        param.push("payType=" + _this.rearch.payType);
+      }
+      if (_this.rearch.status) {
+        param.push("status=" + _this.rearch.status);
+      }
+      if (_this.rearch.content) {
+        param.push("content=" + _this.rearch.content);
+      }
+      if (_this.rearch.recipients) {
+        param.push("recipients=" + _this.rearch.recipients);
+      }
+      if (_this.rearch.distributor) {
+        param.push("distributor=" + _this.rearch.distributor);
+      }
+      let st = _this.datePicker[0];
+      let et = _this.datePicker[1];
+      if (st && et) {
+        param.push("st=" + st + " 00:00:00");
+        param.push("et=" + et + " 23:59:59");
+      }
+
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("orders?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          _this.parentTotalPage = res.pages;
+          let tempList = res.list;
+          _this.$lodash.forEach(tempList, function(item) {
+            item.timeStr = _this
+              .$moment(item.createDate)
+              .format("YYYY/MM/DD HH:mm");
+          });
+          // 测试代码
+          tempList[6].payType = "check";
+          _this.list = tempList;
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.SHIFT_LOADING();
+        });
+    },
+    getDistributorList: function() {
+      let _this = this;
+      let param = [];
+      param.push("pageNum=1");
+      param.push("pageSize=1000");
+      _this.$axios
+        .get("user/dealer?" + param.join("&"))
+        .then(result => {
+          let res = result.data;
+          _this.distributorList = res.list;
+          _this.rearch.distributorList = _.$lodash.deepClone(res.list);
+
+          if (res.list.length > 0) {
+            _this.distributorId = res.list[0].id;
+            _this.rearch.distributorId = res.list[0].id;
+          }
+        })
+        .catch(err => {});
+    },
+    uploadImage: function() {
+      $("#uploadFile").val(null);
+      if ($("#uploadFile").val()) {
+        document.getElementById("uploadImgForm").reset();
+      }
+      document.getElementById("uploadFile").click();
+    },
+    imgUploadFileChange: function(event) {
+      let _this = this;
+      if (event) {
+        var filePath = "";
+        var size = 0;
+        var updatingCount = 0;
+
+        if (event && event.target && event.target.files) {
+          var file = event.target.files[0];
+          size = file.size || 0;
+          filePath = file.name;
+          var index = filePath.lastIndexOf(".");
+          var suffix = filePath.substring(index, filePath.length);
+
+          if (!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(suffix)) {
+            _this.$toast.warning("图片类型必须是.gif,jpeg,jpg,png中的一种");
+            return false;
+          }
+
+          var imgSize = size / 1024 / 1024;
+          if (imgSize > 3) {
+            _this.$toast.warning("图片大小超过3M,请上传小于3M的图片.");
+            return false;
+          }
+          var formData = new FormData();
+          formData.append("file", file);
+
+          let _this = this;
+          _this.$axios
+            .post("upload", formData, {
+              headers: { "Content-Type": "multipart/form-data" }
+            })
+            .then(result => {
+              let res = result.data;
+              _this.pay.payVoucherUrl = imgCdn + res.fileCode;
+              _this.pay.payVoucher = res.fileCode;
+              _this.$toast.success("操作成功");
+            })
+            .catch(err => {});
         }
       }
     }
-  };
+  }
+};
 </script>
 
