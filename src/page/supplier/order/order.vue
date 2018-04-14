@@ -478,7 +478,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" @click="reviewSubmit" v-bind:disabled="loading"  v-bind:readonly="loading" class="btn btn-primary">审核通过</button>
-                  <button type="button" class="btn btn-white" data-dismiss="modal" data-toggle="modal" href="#reason">审核未通过</button>
+                  <button type="button" class="btn btn-white" @click="showReviewFailSubmit">审核未通过</button>
                 </div>
               </div>
             </div>
@@ -549,6 +549,34 @@
             </div>
           </div>
           <!-- 查看大图 End-->
+
+         <!-- 订单取消原因  开始 -->
+         <div id="reason" class="modal fade" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title">未通过原因</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <form role="form">
+                        <div class="form-group">
+                          <textarea class="form-control" rows="5" v-model="orderCancelReason"></textarea>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" @click="reviewFailSubmit">保存</button>
+                  <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+              </div>
+            </div>
+          </div>
+         <!-- 订单取消原因  结束-->
   
         </div>
       </div>
@@ -635,7 +663,8 @@ export default {
         payIndex: -1,
         payVoucherUrl: ""
       },
-      viewImageUrl:""
+      viewImageUrl:"",
+      orderCancelReason:"",
     };
   },
   mounted() {
@@ -645,6 +674,37 @@ export default {
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+    showReviewFailSubmit: function (){
+      let _this = this;
+      _this.orderCancelReason = '';
+      $("#order-detail").modal('hide');
+      $("#reason").modal("show");
+    },
+    reviewFailSubmit: function (){
+      let _this = this;
+      let reason = _this.orderCancelReason.trim();
+      if(reason==""){
+        _this.$toast.warning("原因不可为空");
+        return false;
+      }
+      _this.loading = true;
+      let cur = _this.list[_this.curIndex];
+      _this.PUSH_LOADING();
+      console.error('审核失败需要接口的支持。。。。。。。。。。。。。。。。。。。。');
+      _this.$axios
+        .get("/orders/" + cur.id + "/review")
+        .then(result => {
+          _this.loading = false;
+          _this.$toast.success("操作成功");          
+          $("#reason").modal("hide");
+          $("#review").modal("hide");
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
+    },
     vieImage:function(url){
       let _this = this;
       _this.viewImageUrl = url;
