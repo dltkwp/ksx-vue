@@ -9,9 +9,11 @@
             <div class="ibox">
               <div class="ibox-title"> 订单列表 </div>
               <div class="ibox-content">
+
+
                 <div class="row m-b-sm ">
                   <div class="col-lg-6">
-                    <button class="btn btn-primary btn-sm" @click="shwoSaveModal()">新增订单</button>
+                    <button class="btn btn-primary btn-sm" @click="showSaveModal()">新增订单</button>
                   </div>
                   <div class="col-lg-6 text-right">
                     <div class="btn-group btn-group-sm">
@@ -475,7 +477,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-primary">审核通过</button>
+                  <button type="button" @click="reviewSubmit" v-bind:disabled="loading"  v-bind:readonly="loading" class="btn btn-primary">审核通过</button>
                   <button type="button" class="btn btn-white" data-dismiss="modal" data-toggle="modal" href="#reason">审核未通过</button>
                 </div>
               </div>
@@ -648,7 +650,7 @@ export default {
       _this.viewImageUrl = url;
       $("#look-img").modal('show');
     },
-    shwoSaveModal: function() {
+    showSaveModal: function() {
       this.order = {
         recipients: "",
         recipientsPhone: "",
@@ -729,7 +731,7 @@ export default {
     },
     orderCheckShowModal: function(index) {
       let _this = this;
-      let curIndex = index;
+      _this.curIndex = index;
       let cur = _this.list[index];
       _this.PUSH_LOADING();
       _this.$axios
@@ -750,6 +752,24 @@ export default {
           _this.SHIFT_LOADING();
         });
       $("#review").modal("show");
+    },
+    reviewSubmit: function(){
+      let _this = this;
+      let cur = _this.list[_this.curIndex];
+      _this.loading = true;
+      _this.PUSH_LOADING();
+      _this.$axios
+        .get("orders/" + cur.id + "/review/success?payment=" + cur.payment)
+        .then(result => {
+          _this.loading = false;
+          _this.$toast.success("操作成功");
+          $("#review").modal("hide");
+          _this.SHIFT_LOADING();
+        })
+        .catch(err => {
+          _this.loading = false;
+          _this.SHIFT_LOADING();
+        });
     },
     showChangePriceodal: function(index) {
       let _this = this;
@@ -1077,7 +1097,7 @@ export default {
       let _this = this;
       _this.PUSH_LOADING();
       _this.$axios
-        .get("orders/" + orderId)
+        .get("/orders/" + orderId)
         .then(result => {
           let detail = result.data;
           if (detail.payVoucher) {
@@ -1120,7 +1140,7 @@ export default {
 
       _this.PUSH_LOADING();
       _this.$axios
-        .get("orders?" + param.join("&"))
+        .get("/orders?" + param.join("&"))
         .then(result => {
           let res = result.data;
           _this.parentTotalPage = res.pages;
