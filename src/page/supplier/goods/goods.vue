@@ -3,7 +3,7 @@
       <v-menus></v-menus>
       <div id="page-wrapper" class="gray-bg" style="min-height: 394px;">
         <v-top></v-top>
-        <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="wrapper wrapper-content ">
           <div class="row">
             <div class="col-lg-12">
               <div class="ibox float-e-margins">

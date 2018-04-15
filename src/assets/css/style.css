@@ -4588,7 +4588,7 @@ body.fullscreen-ibox-mode {
 body.modal-open {
   padding-right: inherit !important;
 }
-body.modal-open .wrapper-content.animated {
+ body.modal-open .wrapper-content.animated {
   -webkit-animation: none;
   -ms-animation-nam: none;
   animation: none;
@@ -4596,7 +4596,7 @@ body.modal-open .wrapper-content.animated {
 body.modal-open .animated {
   animation-fill-mode: initial;
   z-index: inherit;
-}
+} 
 /* Show profile dropdown on fixed sidebar */
 body.mini-navbar.fixed-sidebar .profile-element,
 .block {
