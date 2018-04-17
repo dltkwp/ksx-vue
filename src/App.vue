@@ -18,7 +18,7 @@
  import "./lib/inspinia.js"
  import "./lib/plugins/pace/pace.min.js"
 
- import {mapGetters} from 'vuex'
+ import { mapGetters } from 'vuex'
  import * as types from './store/mutation-types'
  import * as components from './components'
 
