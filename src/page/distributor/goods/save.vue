@@ -139,7 +139,6 @@
         <input type="file" name="uploadFile" id="uploadFile" multiple="multiple" style="display:none;" @change="imgUploadFileChange($event)">
       </form>
       </div>
-      <v-foot></v-foot>
    </div>
 </template>
 
@@ -149,13 +148,11 @@ import * as types from "@/store/mutation-types.js";
 
 import vMenus from "@/components/menus/menus.vue";
 import vTop from "@/components/top/top.vue";
-import vFoot from "@/components/foot/foot.vue";
 
 export default {
   components: {
     vMenus,
-    vTop,
-    vFoot
+    vTop
   },
   data() {
     return {

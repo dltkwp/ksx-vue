@@ -128,7 +128,6 @@ import * as types from "@/store/mutation-types.js";
 
 import vMenus from "@/components/menus/menus.vue";
 import vTop from "@/components/top/top.vue";
-import vFoot from "@/components/foot/foot.vue";
 import vEmpty from "@/components/empty/empty.vue";
 
 import { Page } from 'iview'
@@ -137,7 +136,6 @@ export default {
   components: {
     vMenus,
     vTop,
-    vFoot,
     vEmpty,
     Page
   },
