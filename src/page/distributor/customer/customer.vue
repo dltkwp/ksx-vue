@@ -50,7 +50,7 @@
                         </tbody>
                         </table>
                         <v-empty :isShow="parentTotalPage==0"></v-empty>
-                        <pagination  :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
+                        <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="parentCurrentpage" @on-change="parentCallback"></page>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,8 @@ import vTop from "@/components/top/top.vue";
 import vFoot from "@/components/foot/foot.vue";
 import vEmpty from "@/components/empty/empty.vue";
 
-import pagination from "@/components/pagination/pagination.vue";
+import { Page } from "iview";
+
 
 export default {
   components: {
@@ -115,7 +116,7 @@ export default {
     vTop,
     vFoot,
     vEmpty,
-    pagination
+    Page
   },
   data() {
     return {

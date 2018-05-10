@@ -4,7 +4,7 @@ export default {
     axios.defaults.timeout = 5000 // 响应时间
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8' // 配置请求头
     // axios.defaults.baseURL = 'http://192.168.0.102:8081/' // 配置接口地址 http://39.106.65.215:8081/EasyTime
-    axios.defaults.baseURL = 'https://api.leweisoft.com/EasyTime' // 配置接口地址 http://39.106.65.215:8081/EasyTime
+    axios.defaults.baseURL = 'https://api.leweisoft.com/web' // 配置接口地址 http://39.106.65.215:8081/EasyTime
     // axios.defaults.baseURL = 'http://192.168.199.155:8081' // 配置接口地址 http://39.106.65.215:8081/EasyTime
 
     axios.interceptors.request.use(

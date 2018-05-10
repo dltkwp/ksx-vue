@@ -9,8 +9,6 @@
             <div class="ibox">
               <div class="ibox-title"> 订单列表 </div>
               <div class="ibox-content">
-
-
                 <div class="row m-b-sm ">
                   <div class="col-lg-6">
                     <button class="btn btn-primary btn-sm" @click="showSaveModal()">新增订单</button>
@@ -86,10 +84,9 @@
                   </tbody>
                 </table>
                 <v-empty :isShow="parentTotalPage==0"></v-empty>
-                <pagination :totalPage="parentTotalPage" :currentPage="parentCurrentpage" :changeCallback="parentCallback"></pagination>
+                <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="parentCurrentpage" @on-change="parentCallback"></page>
               </div>
             </div>
-  
           </div>
   
           <!-- 改动价格 开始-->
@@ -596,8 +593,7 @@ import vTop from "@/components/top/top.vue";
 import vFoot from "@/components/foot/foot.vue";
 import vEmpty from "@/components/empty/empty.vue";
 
-import pagination from "@/components/pagination/pagination.vue";
-import { DatePicker } from "iview";
+import { DatePicker,Page } from "iview";
 
 export default {
   components: {
@@ -605,7 +601,7 @@ export default {
     vTop,
     vFoot,
     vEmpty,
-    pagination,
+    Page,
     DatePicker
   },
   data() {
