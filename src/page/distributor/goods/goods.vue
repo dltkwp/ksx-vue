@@ -68,7 +68,7 @@
                       </tbody>
                     </table>
                     <v-empty :isShow="parentTotalPage==0"></v-empty>
-                    <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="parentCurrentpage" @on-change="parentCallback"></page>
+                    <page :pageSize="pageSize" v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="pageNo" @on-change="parentCallback"></page>
                   </div>
                 </div>
               </div>
@@ -141,7 +141,8 @@ export default {
       categoriesIdMap: [],
       categoryList: [],
       parentTotalPage: 0,
-      parentCurrentpage: 1
+      pageNo: 1,
+      pageSize:15,
     };
   },
   mounted() {
@@ -153,7 +154,7 @@ export default {
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
     advRearchSubmit:function(){
-      this.parentCurrentpage = 1;
+      this.pageNo = 1;
       this.listData();
       $("#search-more").modal("hide");
     },
@@ -161,19 +162,19 @@ export default {
       $("#search-more").modal("show");
     },
     rearchSubmit: function() {
-      this.parentCurrentpage = 1;
+      this.pageNo = 1;
       this.listData();
     },
     parentCallback(cPage) {
-      this.parentCurrentpage = cPage;
+      this.pageNo = cPage;
       this.listData();
     },
     listData() {
       let _this = this;
       _this.PUSH_LOADING();
       let param = [];
-      param.push("pageNum=" + _this.parentCurrentpage);
-      param.push("pageSize=" + 15);
+      param.push("pageNum=" + _this.pageNo);
+      param.push("pageSize=" + _this.pageSize);
       if (!_this.$lodash.isEmpty(_this.resarch.productName)) {
         param.push("queryKey=" + _this.resarch.productName);
       }
@@ -187,7 +188,7 @@ export default {
         .get("products?" + param.join("&"))
         .then(result => {
           let res = result.data;
-          _this.parentTotalPage = res.pages;
+          _this.parentTotalPage = res.total;
           _this.$lodash.forEach(res.list, function(item) {
               let _category = _this.categoriesIdMap[item.categoriesId];
               item.categoriesName = _category ? _category.categoriesName : "";
@@ -205,7 +206,7 @@ export default {
     categroyChange:function(index){
       let cur = this.categoryList[index];
       this.resarch.curCategory = cur;
-       this.parentCurrentpage = 1;
+       this.pageNo = 1;
       this.listData();
     },
     categoryListData() {

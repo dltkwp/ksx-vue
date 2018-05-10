@@ -114,7 +114,7 @@
                       <div class="img"></div>
                       <div class="empty-info font-grey-salt">暂无数据</div>
                     </div>
-                    <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="parentCurrentpage" @on-change="parentCallback"></page>
+                    <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="pageNo" @on-change="parentCallback"></page>
                   </div>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default {
       loading: false,
       list: [],
       parentTotalPage: 0,
-      parentCurrentpage: 1,
+      pageNo: 1,
       curIndex: -1,
       rearch: {
         st: "",
@@ -247,7 +247,7 @@ export default {
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
     rearchSubmit:function(){
-      this.parentCurrentpage = 1;
+      this.pageNo = 1;
       this.listData();
     },
     showSendModal: function(index) {
@@ -377,13 +377,13 @@ export default {
         });
     },
     parentCallback(cPage) {
-      this.parentCurrentpage = cPage;
+      this.pageNo = cPage;
       this.listData();
     },
     listData() {
       let _this = this;
       let param = [];
-      param.push("pageNum=" + _this.parentCurrentpage);
+      param.push("pageNum=" + _this.pageNo);
       param.push("pageSize=" + 15);
       param.push("isSupplier=1");
 

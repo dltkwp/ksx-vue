@@ -50,7 +50,7 @@
                         </tbody>
                         </table>
                         <v-empty :isShow="parentTotalPage==0"></v-empty>
-                        <page v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="parentCurrentpage" @on-change="parentCallback"></page>
+                        <page :pageSize="pageSize" v-if="parentTotalPage>0" :total="parentTotalPage" show-total :current="pageNo" @on-change="parentCallback"></page>
                     </div>
                 </div>
             </div>
@@ -121,7 +121,8 @@ export default {
       loading: false,
       list: [],
       parentTotalPage: 0,
-      parentCurrentpage: 1,
+      pageNo: 1,
+      pageSize:15,
       queryKey: "",
       save: {
         name: "",
@@ -133,7 +134,7 @@ export default {
   },
   mounted() {
     this.SHIFT_LOADING();
-    this.parentCurrentpage = 1;
+    this.pageNo = 1;
     this.listData();
   },
   methods: {
@@ -173,7 +174,7 @@ export default {
             case 200:
               {
                 _this.$toast.success("操作成功");
-                _this.parentCurrentpage = 1;
+                _this.pageNo = 1;
                 _this.loading = false;
                 _this.listData();
                 _this.SHIFT_LOADING();
@@ -192,7 +193,7 @@ export default {
         });
     },
     parentCallback(cPage) {
-      this.parentCurrentpage = cPage;
+      this.pageNo = cPage;
       this.listData();
     },
     showAddModal: function() {
@@ -204,14 +205,14 @@ export default {
       $("#distroibutor-add").modal("show");
     },
     rearchSubmit: function() {
-      this.parentCurrentpage = 1;
+      this.pageNo = 1;
       this.listData();
     },
     listData() {
       let _this = this;
       let param = [];
-      param.push("pageNum=" + _this.parentCurrentpage);
-      param.push("pageSize=" + 15);
+      param.push("pageNum=" + _this.pageNo);
+      param.push("pageSize=" + _this.pageSize);
       let queryKey = _this.queryKey.trim();
       if (queryKey) {
         param.push("queryKey=" + queryKey);
@@ -221,7 +222,7 @@ export default {
         .get("user/normal?" + param.join("&"))
         .then(result => {
           let res = result.data;
-          _this.parentTotalPage = res.pages;
+          _this.parentTotalPage = res.total;
           _this.list = res.list;
           _this.SHIFT_LOADING();
         })
