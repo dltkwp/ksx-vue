@@ -173,7 +173,7 @@ export default {
     listData() {
       let _this = this;
       _this.PUSH_LOADING();
-      let param = [];
+      let param = ['isOwner=true'];
       param.push("pageNum=" + _this.pageNo);
       param.push("pageSize=" + _this.pageSize);
       if (!_this.$lodash.isEmpty(_this.resarch.productName)) {
@@ -195,7 +195,8 @@ export default {
                 _this.$lodash.forEach(res.list, function(item) {
               
                   _this.$lodash.forEach(item.images,function(img,imgIndex){
-                      img.realUrl = imgCdn + img.imageCode;
+                      let code = img.imageCode.replace('product/','');
+                      img.realUrl = imgCdn + code;
                   })
 
                   let curCategory = _this.$lodash.find(_this.categoryList,{id:item.categoriesId});

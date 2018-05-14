@@ -115,7 +115,7 @@ import { mapActions, mapGetters } from "vuex";
 import * as types from "@/store/mutation-types.js";
 
 import vMenus from "@/components/menus/menus.vue";
-import vTop from "@/components/top/top.vue";
+import vTop from "@/components/top/top.vue"
 import { Page } from "iview";
 
 import vEmpty from "@/components/empty/empty.vue";
@@ -172,7 +172,7 @@ export default {
     listData() {
       let _this = this;
       _this.PUSH_LOADING();
-      let param = [];
+      let param = ['isOwner=false'];
       param.push("pageNum=" + _this.pageNo);
       param.push("pageSize=" + _this.pageSize);
       if (!_this.$lodash.isEmpty(_this.resarch.productName)) {
@@ -192,9 +192,10 @@ export default {
           _this.$lodash.forEach(res.list, function(item) {
               let _category = _this.categoriesIdMap[item.categoriesId];
               item.categoriesName = _category ? _category.categoriesName : "";
-              _.forEach(item.images,function(img,imgIndex){
-                  img.realUrl = imgCdn + img.imageCode;
-              })
+               _this.$lodash.forEach(item.images,function(img,imgIndex){
+                    let code = img.imageCode.replace('product/','');
+                    img.realUrl = imgCdn + code;
+                })
           });
           _this.list = res.list;
           _this.SHIFT_LOADING();

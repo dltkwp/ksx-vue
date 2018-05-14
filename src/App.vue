@@ -50,5 +50,11 @@
   @import "assets/font-awesome/css/font-awesome.css";
   @import "assets/css/animate.css";
   @import "assets/css/jasny-bootstrap.min.css";
+
+  @import 'assets/css/quill.core.css';
+  @import 'assets/css/quill.snow.css';
+  @import 'assets/css/quill.bubble.css';
+  
   @import "assets/css/style.css";
+
 </style>

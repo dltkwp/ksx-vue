@@ -54,7 +54,13 @@
                                       <div class="form-group"><label class="col-sm-2 control-label">产品介绍:</label>
                                           <div class="col-sm-10">
                                               <div class="summernote">
-                                                <input v-model="save.description" type="text" class="form-control" placeholder="" maxlenth="8">
+                                                <quill-editor v-model="save.description" style="height:260px;"
+                                                    ref="myQuillEditor"
+                                                    :options="editorOption"
+                                                    @blur="onEditorBlur($event)"
+                                                    @focus="onEditorFocus($event)"
+                                                    @ready="onEditorReady($event)">
+                                                </quill-editor>
                                               </div>
                                           </div>
                                       </div>
@@ -138,6 +144,9 @@
       <form action="" id="uploadImgForm" style="display:none;">
         <input type="file" name="uploadFile" id="uploadFile" multiple="multiple" style="display:none;" @change="imgUploadFileChange($event)">
       </form>
+      <form action="" id="uploadImgFormEdit" style="display:none;">
+        <input type="file" name="uploadFileEdit" id="uploadFileEdit" multiple="multiple" style="display:none;" @change="imgUploadEditFileChange($event)">
+      </form>
       </div>
    </div>
 </template>
@@ -146,13 +155,16 @@
 import { mapActions, mapGetters } from "vuex";
 import * as types from "@/store/mutation-types.js";
 
+import { quillEditor } from 'vue-quill-editor'
+import Quill from 'quill'
 import vMenus from "@/components/menus/menus.vue";
 import vTop from "@/components/top/top.vue";
 
 export default {
   components: {
     vMenus,
-    vTop
+    vTop,
+    quillEditor
   },
   data() {
     return {
@@ -173,7 +185,8 @@ export default {
       },
       leveList: [],
       imageIndex: -1,
-      images: []
+      images: [],
+      editorOption: {}
     };
   },
   mounted() {
@@ -181,9 +194,38 @@ export default {
     this.levelListData();
     this.categoryListData();
     this.inintImages();
+
+    let imgHandler = async function(state) {
+      if (state) {
+          $("#uploadFileEdit").val(null);
+          if ($("#uploadFileEdit").val()) {
+            document.getElementById("uploadImgFormEdit").reset();
+          }
+          document.getElementById("uploadFileEdit").click();
+      }
+    }
+    _this.$refs.myQuillEditor.quill.getModule("toolbar").addHandler("image", imgHandler)
+  },
+  computed: {
+    editor() {
+      return this.$refs.myQuillEditor.quill
+    }
   },
   methods: {
     ...mapActions([types.LOADING.PUSH_LOADING, types.LOADING.SHIFT_LOADING]),
+     onEditorBlur(quill) {
+      console.log('editor blur!', quill)
+    },
+    onEditorFocus(quill) {
+      console.log('editor focus!', quill)
+    },
+    onEditorReady(quill) {
+      console.log('editor ready!', quill)
+    },
+    onEditorChange({ quill, html, text }) {
+      console.log('editor change!', quill, html, text)
+      this.description = html
+    },
     tabChange(key) {
       this.tabType = key;
       switch (key) {
@@ -443,7 +485,52 @@ export default {
             .catch(err => {});
         }
       }
-    }
+    },
+    imgUploadEditFileChange: function(event) {
+      let _this = this;
+      if (event) {
+        var filePath = "";
+        var size = 0;
+        var updatingCount = 0;
+
+        if (event && event.target && event.target.files) {
+          var file = event.target.files[0];
+          size = file.size || 0;
+          filePath = file.name;
+          var index = filePath.lastIndexOf(".");
+          var suffix = filePath.substring(index, filePath.length);
+
+          if (!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(suffix)) {
+            _this.$toast.warning("图片类型必须是.gif,jpeg,jpg,png中的一种");
+            return false;
+          }
+
+          var imgSize = size / 1024 / 1024;
+          if (imgSize > 3) {
+            _this.$toast.warning("图片大小超过3M,请上传小于3M的图片.");
+            return false;
+          }
+          var formData = new FormData();
+          formData.append("file", file);
+
+          _this.$axios
+            .post("upload", formData, {
+              headers: { "Content-Type": "multipart/form-data" }
+            })
+            .then(result => {
+              let res = result.data;
+              _this.$toast.success("操作成功");
+              var len = _this.$refs.myQuillEditor.quill.getLength();
+              try {
+                _this.$refs.myQuillEditor.quill.insertEmbed(len + 1, 'image', superConst.IMAGE_STATIC_URL + res.fileCode , Quill.sources.USER)
+              }catch(e){
+                console.error(e);
+              }
+            })
+            .catch(err => {});
+        }
+      }
+    },
   }
 };
 </script>

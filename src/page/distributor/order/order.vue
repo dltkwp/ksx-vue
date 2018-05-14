@@ -618,7 +618,7 @@ export default {
         recipients: "",
         distributor: "",
         showStatusText: "",
-        isSupplier: 1,
+        isSupplier: 0,
         distributorList: [],
         distributorId: ""
       },
@@ -1170,7 +1170,7 @@ export default {
       let param = [];
       param.push("pageNum=" + _this.pageNo);
       param.push("pageSize=" + _this.pageSize);
-      param.push("isSupplier=1");
+      param.push("isSupplier=0");
       if (_this.rearch.payType) {
         param.push("payType=" + _this.rearch.payType);
       }
