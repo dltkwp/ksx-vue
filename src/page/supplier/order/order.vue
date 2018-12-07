@@ -313,20 +313,20 @@
                         <div class="form-group">
                           <label>分销商</label>
                           <select v-model="distributorId" class="form-control">
-                                  <option v-for="(item,index) in distributorList " :key="index" v-bind:value="item.id">
-                                    {{ item.username }}
-                                  </option>
-                              </select>
+                              <option v-for="(item,index) in distributorList" :key="index" v-bind:value="item.id">
+                                {{ item.username }}
+                              </option>
+                          </select>
                         </div>
                         <div class="form-group">
                           <label>支付方式</label>
                           <div class="col-sm-12 m-b-md ">
                             <label class="radio-inline">
-                                <input type="radio" @click="payTypeChange('none')"  name="inlineCheckbox1">暂未付款 </label>
+                                <input type="radio" @click="payTypeChange('none')" v-bind:checked='order.payType=="none"' name="inlineCheckbox1">暂未付款 </label>
                             <label class="radio-inline">
-                                <input type="radio"  @click="payTypeChange('wechat')"  name="inlineCheckbox1">微信 </label>
+                                <input type="radio"  @click="payTypeChange('wechat')"  v-bind:checked='order.payType=="wechat"' name="inlineCheckbox1">微信 </label>
                             <label class="radio-inline">
-                                 <input type="radio"  @click="payTypeChange('alipay')" name="inlineCheckbox1">支付宝 </label>
+                                 <input type="radio"  @click="payTypeChange('alipay')"  v-bind:checked='order.payType=="alipay"' name="inlineCheckbox1">支付宝 </label>
                           </div>
                         </div>
                         <div class="form-group" v-if="order.payType!=='none'">
@@ -649,6 +649,7 @@ export default {
       },
       distributorList: [], //新增订单时分销商的列表
       distributorId: "", //新增订单时所选择的
+      curPayType:'wechat',
       pay: {
         // 收款模型
         payType: "wechat", //  支付类型
@@ -706,15 +707,19 @@ export default {
       $("#look-img").modal('show');
     },
     showSaveModal: function() {
-      this.order = {
+      let _this = this;
+      _this.order = {
         recipients: "",
         recipientsPhone: "",
         recipientsAddress: "",
         content: "",
-        payType: "",
+        payType: "wechat",
         payAccount: "",
         payment: ""
       };
+      if(_this.distributorList.length>0){
+        _this.distributorId = _this.distributorList[0].id;
+      }
       $("#order-add").modal("show");
     },
     handleChange(date) {
@@ -914,20 +919,6 @@ export default {
     },
     payTypeChange: function(key) {
       this.order.payType = key;
-      switch (key) {
-        case "none":
-          {
-          }
-          break;
-        case "alipay":
-          {
-          }
-          break;
-        case "wechat":
-          {
-          }
-          break;
-      }
     },
     orderSave: function() {
       let _this = this;
@@ -971,7 +962,7 @@ export default {
         payType: payType,
         payAccount: payAccount,
         payment: payment,
-        isAgent: false
+        isAgent: true
       };
       if (distributorId) {
         param.agentId = distributorId;
